@@ -155,9 +155,22 @@ install_packages() {
 setup_hostapd() {
     print_info "Configuring hostapd..."
     
-    # Disable power management on WiFi interface (prevents disconnects)
-    iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
-    iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+    # Check if iw/iwconfig available, if not skip power management
+    if command -v iw &>/dev/null; then
+        iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    fi
+    if command -v iwconfig &>/dev/null; then
+        iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+    fi
+    
+    # Detect WiFi capabilities
+    local HT_CAPS=""
+    if command -v iw &>/dev/null; then
+        # Check if HT40 supported
+        if iw phy | grep -q "HT40"; then
+            HT_CAPS="[HT40+][SHORT-GI-20][SHORT-GI-40]"
+        fi
+    fi
     
     cat > /etc/hostapd/hostapd.conf << EOF
 # Interface and driver
@@ -192,16 +205,42 @@ max_num_sta=10
 rts_threshold=2347
 fragm_threshold=2346
 
-# Enhanced client compatibility
-ap_isolate=0
-ht_capab=[HT40+][SHORT-GI-20][SHORT-GI-40][DSSS_CCK-40]
-
 # Timeouts (prevent premature disconnects)
 ap_max_inactivity=300
 EOF
 
+    # Add HT capabilities only if supported
+    if [ -n "$HT_CAPS" ]; then
+        echo "ht_capab=$HT_CAPS" >> /etc/hostapd/hostapd.conf
+        print_info "HT capabilities enabled: $HT_CAPS"
+    else
+        print_warn "HT capabilities detection skipped (basic mode)"
+    fi
+
     # Point hostapd to config file
     sed -i 's|#DAEMON_CONF=""|DAEMON_CONF="/etc/hostapd/hostapd.conf"|g' /etc/default/hostapd
+    
+    # Verify config syntax
+    if ! hostapd -t /etc/hostapd/hostapd.conf 2>/dev/null; then
+        print_warn "Config test failed, using minimal config..."
+        # Fallback to minimal working config
+        cat > /etc/hostapd/hostapd.conf << EOF
+interface=$WIFI_INTERFACE
+driver=nl80211
+ssid=$SSID
+hw_mode=g
+channel=$CHANNEL
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=$PASSWORD
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+country_code=ID
+EOF
+    fi
     
     print_info "hostapd configured"
 }
@@ -334,10 +373,18 @@ start_hotspot() {
         sleep 1
     fi
     
-    # Disable power management to prevent disconnects
-    print_info "Disabling power management..."
-    iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
-    iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+    # Disable power management to prevent disconnects (if tools available)
+    if command -v iw &>/dev/null || command -v iwconfig &>/dev/null; then
+        print_info "Disabling power management..."
+        if command -v iw &>/dev/null; then
+            iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+        fi
+        if command -v iwconfig &>/dev/null; then
+            iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+        fi
+    else
+        print_warn "iw/iwconfig not found, skipping power management config"
+    fi
     
     # Set WiFi to always on (no sleep)
     ethtool -s $WIFI_INTERFACE wol d 2>/dev/null || true

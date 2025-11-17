@@ -65,8 +65,12 @@ check_wifi_interface() {
     fi
     
     # Disable power management (again, in case it was re-enabled)
-    iw dev "$WIFI_INTERFACE" set power_save off 2>/dev/null
-    iwconfig "$WIFI_INTERFACE" power off 2>/dev/null
+    if command -v iw &>/dev/null; then
+        iw dev "$WIFI_INTERFACE" set power_save off 2>/dev/null || true
+    fi
+    if command -v iwconfig &>/dev/null; then
+        iwconfig "$WIFI_INTERFACE" power off 2>/dev/null || true
+    fi
     
     return 0
 }
@@ -74,6 +78,12 @@ check_wifi_interface() {
 # Check for stuck clients (connected but no traffic)
 check_client_activity() {
     local WIFI_INTERFACE=$(cat /etc/hostapd/hostapd.conf | grep "^interface=" | cut -d= -f2)
+    
+    # Skip if iw not available
+    if ! command -v iw &>/dev/null; then
+        return 0
+    fi
+    
     local CLIENT_COUNT=$(iw dev "$WIFI_INTERFACE" station dump 2>/dev/null | grep -c "^Station")
     
     if [ "$CLIENT_COUNT" -gt 0 ]; then
