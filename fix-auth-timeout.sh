@@ -27,7 +27,7 @@ echo ""
 echo "=== Step 2: Apply ULTRA-COMPATIBLE config ==="
 echo ""
 
-sudo bash -c 'cat > /etc/hostapd/hostapd.conf << EOF
+sudo bash -c 'cat > /etc/hostapd/hostapd.conf << "EOF"
 # ============================================
 # ULTRA-COMPATIBLE CONFIG
 # ============================================
