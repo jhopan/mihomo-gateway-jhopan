@@ -1,0 +1,15 @@
+[Unit]
+Description=USB Tethering Watchdog Service
+After=network.target mihomo.service hostapd.service
+Wants=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/mihomo-gateway/scripts/usb-watchdog.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
