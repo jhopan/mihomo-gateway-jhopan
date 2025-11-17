@@ -1,0 +1,20 @@
+# Custom Rules Provider
+# Add your own custom routing rules here
+
+payload:
+  # Example custom rules
+  # Uncomment and modify as needed
+
+  # Domain exact match
+  # - DOMAIN,example.com
+
+  # Domain suffix match (includes subdomains)
+  # - DOMAIN-SUFFIX,example.com
+
+  # Domain keyword match
+  # - DOMAIN-KEYWORD,example
+
+  # IP CIDR match
+  # - IP-CIDR,1.2.3.4/24
+
+  # Add your custom rules below:

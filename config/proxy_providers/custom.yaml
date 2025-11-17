@@ -1,0 +1,55 @@
+# Custom Proxy Provider
+# Add your manual proxy servers here
+
+proxies:
+  # Example: VMess
+  - name: "Example-VMess"
+    type: vmess
+    server: example.com
+    port: 443
+    uuid: your-uuid-here
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: false
+    servername: example.com
+    network: ws
+    ws-opts:
+      path: /path
+      headers:
+        Host: example.com
+
+  # Example: Trojan
+  - name: "Example-Trojan"
+    type: trojan
+    server: example.com
+    port: 443
+    password: your-password
+    sni: example.com
+    skip-cert-verify: false
+    udp: true
+
+  # Example: Shadowsocks
+  - name: "Example-SS"
+    type: ss
+    server: example.com
+    port: 8388
+    cipher: aes-256-gcm
+    password: your-password
+    udp: true
+
+  # Example: VLESS
+  - name: "Example-VLESS"
+    type: vless
+    server: example.com
+    port: 443
+    uuid: your-uuid-here
+    tls: true
+    skip-cert-verify: false
+    servername: example.com
+    network: ws
+    ws-opts:
+      path: /path
+      headers:
+        Host: example.com
+# Add more proxies as needed...

@@ -1,0 +1,76 @@
+# Mihomo Gateway .gitignore
+
+# Config files with sensitive data
+config/config.yaml
+config/proxies/*.yaml
+!config/proxies/custom.yaml
+config/rules/*.yaml
+!config/rules/custom.yaml
+!config/rules/streaming.yaml
+
+# Logs
+*.log
+logs/
+var/log/
+
+# Backups
+*.backup
+*.bak
+backup/
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# PHP session files
+webui/sessions/
+
+# Uploaded files
+webui/uploads/
+
+# Cache
+cache/
+*.cache
+
+# Node modules (if any)
+node_modules/
+
+# Compiled files
+*.pyc
+*.pyo
+__pycache__/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Secrets
+.env
+secrets.txt
+*.key
+*.pem
+*.crt
+
+# Personal notes
+notes.txt
+TODO.txt

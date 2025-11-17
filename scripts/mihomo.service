@@ -1,0 +1,25 @@
+[Unit]
+Description=Mihomo Proxy Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/etc/mihomo
+ExecStart=/opt/mihomo/mihomo -d /etc/mihomo -f /etc/mihomo/config.yaml
+Restart=on-failure
+RestartSec=10s
+StandardOutput=append:/var/log/mihomo/mihomo.log
+StandardError=append:/var/log/mihomo/mihomo.log
+
+# Security options
+NoNewPrivileges=false
+ProtectSystem=false
+ProtectHome=false
+
+# Capabilities for TUN device and network
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_RAW
+
+[Install]
+WantedBy=multi-user.target

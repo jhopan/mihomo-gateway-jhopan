@@ -1,0 +1,18 @@
+# Backup Proxy Provider
+# Fallback proxies when main subscription fails
+
+proxies:
+  # Add your backup proxy servers here
+  # Same format as custom.yaml
+
+  # Example backup server
+  - name: "Backup-Server-1"
+    type: vmess
+    server: backup.example.com
+    port: 443
+    uuid: backup-uuid-here
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: false
+    network: tcp
