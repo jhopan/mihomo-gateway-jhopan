@@ -196,19 +196,29 @@ country_code=ID
 ieee80211n=1
 ieee80211d=1
 
-# Stability improvements - NEVER disconnect clients
+# Stability improvements - Optimized for ath10k and old laptops
 beacon_int=100
 dtim_period=2
 max_num_sta=10
 
-# Timeouts - DISABLED (0 = never timeout)
-ap_max_inactivity=0
+# Timeouts - Optimized (600 = 10 minutes, proven stable)
+ap_max_inactivity=600
 disassoc_low_ack=0
 skip_inactivity_poll=1
+
+# Rekey intervals - Long intervals for stability
+wpa_group_rekey=86400
+wpa_ptk_rekey=600
 
 # Control interface for monitoring
 ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
+
+# AP isolation OFF (allow client-to-client)
+ap_isolate=0
+
+# Key index workaround for compatibility
+eapol_key_index_workaround=1
 
 # Disable client power saving detection
 wmm_ac_bk_cwmin=4
