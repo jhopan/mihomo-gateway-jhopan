@@ -155,22 +155,20 @@ install_packages() {
 setup_hostapd() {
     print_info "Configuring hostapd..."
     
-    # Check if iw/iwconfig available, if not skip power management
-    if command -v iw &>/dev/null; then
-        iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    # Disable power management with full paths
+    if [ -x /usr/sbin/iw ]; then
+        /usr/sbin/iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    elif [ -x /sbin/iw ]; then
+        /sbin/iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
     fi
-    if command -v iwconfig &>/dev/null; then
-        iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+    if [ -x /sbin/iwconfig ]; then
+        /sbin/iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
     fi
     
-    # Detect WiFi capabilities
+    # Skip HT capabilities - causes "Hardware does not support configured channel" error
+    # Most WiFi cards don't properly support HT40 in AP mode
     local HT_CAPS=""
-    if command -v iw &>/dev/null; then
-        # Check if HT40 supported
-        if iw phy | grep -q "HT40"; then
-            HT_CAPS="[HT40+][SHORT-GI-20][SHORT-GI-40]"
-        fi
-    fi
+    print_info "Using basic 802.11g/n (HT40 disabled for compatibility)"
     
     cat > /etc/hostapd/hostapd.conf << EOF
 # Interface and driver
@@ -373,17 +371,15 @@ start_hotspot() {
         sleep 1
     fi
     
-    # Disable power management to prevent disconnects (if tools available)
-    if command -v iw &>/dev/null || command -v iwconfig &>/dev/null; then
-        print_info "Disabling power management..."
-        if command -v iw &>/dev/null; then
-            iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
-        fi
-        if command -v iwconfig &>/dev/null; then
-            iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
-        fi
-    else
-        print_warn "iw/iwconfig not found, skipping power management config"
+    # Disable power management to prevent disconnects (use full paths)
+    print_info "Disabling power management..."
+    if [ -x /usr/sbin/iw ]; then
+        /usr/sbin/iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    elif [ -x /sbin/iw ]; then
+        /sbin/iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    fi
+    if [ -x /sbin/iwconfig ]; then
+        /sbin/iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
     fi
     
     # Set WiFi to always on (no sleep)

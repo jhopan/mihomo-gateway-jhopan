@@ -64,12 +64,14 @@ check_wifi_interface() {
         return 1
     fi
     
-    # Disable power management (again, in case it was re-enabled)
-    if command -v iw &>/dev/null; then
-        iw dev "$WIFI_INTERFACE" set power_save off 2>/dev/null || true
+    # Disable power management (again, in case it was re-enabled) - use full paths
+    if [ -x /usr/sbin/iw ]; then
+        /usr/sbin/iw dev "$WIFI_INTERFACE" set power_save off 2>/dev/null || true
+    elif [ -x /sbin/iw ]; then
+        /sbin/iw dev "$WIFI_INTERFACE" set power_save off 2>/dev/null || true
     fi
-    if command -v iwconfig &>/dev/null; then
-        iwconfig "$WIFI_INTERFACE" power off 2>/dev/null || true
+    if [ -x /sbin/iwconfig ]; then
+        /sbin/iwconfig "$WIFI_INTERFACE" power off 2>/dev/null || true
     fi
     
     return 0
@@ -79,24 +81,29 @@ check_wifi_interface() {
 check_client_activity() {
     local WIFI_INTERFACE=$(cat /etc/hostapd/hostapd.conf | grep "^interface=" | cut -d= -f2)
     
-    # Skip if iw not available
-    if ! command -v iw &>/dev/null; then
+    # Skip if iw not available (check full paths)
+    local IW_CMD=""
+    if [ -x /usr/sbin/iw ]; then
+        IW_CMD="/usr/sbin/iw"
+    elif [ -x /sbin/iw ]; then
+        IW_CMD="/sbin/iw"
+    else
         return 0
     fi
     
-    local CLIENT_COUNT=$(iw dev "$WIFI_INTERFACE" station dump 2>/dev/null | grep -c "^Station")
+    local CLIENT_COUNT=$($IW_CMD dev "$WIFI_INTERFACE" station dump 2>/dev/null | grep -c "^Station")
     
     if [ "$CLIENT_COUNT" -gt 0 ]; then
         log_message "INFO: $CLIENT_COUNT client(s) connected"
         
-        # Check for inactive clients (no traffic for 5 minutes)
-        iw dev "$WIFI_INTERFACE" station dump 2>/dev/null | grep -A 5 "^Station" | while read line; do
+        # Check for inactive clients (no traffic for 10 minutes) - increased timeout
+        $IW_CMD dev "$WIFI_INTERFACE" station dump 2>/dev/null | grep -A 5 "^Station" | while read line; do
             if echo "$line" | grep -q "inactive time"; then
                 local INACTIVE_TIME=$(echo "$line" | grep -oP '\d+')
-                if [ "$INACTIVE_TIME" -gt 300000 ]; then  # 5 minutes in ms
+                if [ "$INACTIVE_TIME" -gt 600000 ]; then  # 10 minutes in ms (was 5, too aggressive)
                     local MAC=$(echo "$PREV_LINE" | awk '{print $2}')
                     log_message "WARNING: Client $MAC inactive for ${INACTIVE_TIME}ms, disconnecting..."
-                    iw dev "$WIFI_INTERFACE" station del "$MAC" 2>/dev/null
+                    $IW_CMD dev "$WIFI_INTERFACE" station del "$MAC" 2>/dev/null
                 fi
             fi
             PREV_LINE="$line"
