@@ -19,7 +19,7 @@ log-level: warning # Warning level untuk pantau error ringan
 
 # External Controller (API)
 external-controller: 0.0.0.0:9090
-external-ui: /var/www/html/mihomo-ui/dashboard
+# external-ui: /var/www/html/mihomo-ui/dashboard # Disabled - using custom Nginx WebUI
 secret: "mihomo-gateway-2024" # Ganti ini!
 
 # IPv6 support (disabled untuk stabilitas)
