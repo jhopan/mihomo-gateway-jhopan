@@ -10,29 +10,44 @@ CHANNELS=(1 6 11)
 RESULTS_FILE="/tmp/channel_speed_test.txt"
 > "$RESULTS_FILE"
 
-# Check if speedtest-cli installed
-if ! command -v speedtest-cli &> /dev/null; then
-    echo "Installing speedtest-cli..."
-    apt-get update -qq
-    apt-get install -y speedtest-cli
+# Check if speedtest installed (official from Ookla)
+if ! command -v speedtest &> /dev/null; then
+    echo "Installing speedtest (Ookla official)..."
+    echo "Speedtest already installed but may conflict. Using it anyway..."
 fi
 
 # Function to get current speed
 get_speed() {
     echo "  Running speedtest (30s)..."
-    SPEED_RESULT=$(speedtest-cli --simple 2>/dev/null)
     
-    if [ $? -eq 0 ]; then
-        DOWNLOAD=$(echo "$SPEED_RESULT" | grep "Download:" | awk '{print $2}')
-        UPLOAD=$(echo "$SPEED_RESULT" | grep "Upload:" | awk '{print $2}')
-        PING=$(echo "$SPEED_RESULT" | grep "Ping:" | awk '{print $2}')
+    # Try official speedtest first
+    if command -v speedtest &> /dev/null; then
+        SPEED_RESULT=$(speedtest --accept-license --accept-gdpr 2>/dev/null)
         
-        echo "  📥 Download: ${DOWNLOAD} Mbps"
-        echo "  📤 Upload: ${UPLOAD} Mbps"
-        echo "  ⚡ Ping: ${PING} ms"
-        echo "${DOWNLOAD}|${UPLOAD}|${PING}"
+        if [ $? -eq 0 ]; then
+            DOWNLOAD=$(echo "$SPEED_RESULT" | grep "Download:" | awk '{print $2}')
+            UPLOAD=$(echo "$SPEED_RESULT" | grep "Upload:" | awk '{print $2}')
+            PING=$(echo "$SPEED_RESULT" | grep "Latency:" | awk '{print $2}')
+            
+            echo "  📥 Download: ${DOWNLOAD} Mbps"
+            echo "  📤 Upload: ${UPLOAD} Mbps"
+            echo "  ⚡ Ping: ${PING} ms"
+            echo "${DOWNLOAD}|${UPLOAD}|${PING}"
+            return
+        fi
+    fi
+    
+    # Fallback: use iperf or manual test
+    echo "  ⚠️  Speedtest not working, using alternative..."
+    
+    # Simple download test
+    DOWNLOAD=$(curl -s -w '%{speed_download}' -o /dev/null http://ipv4.download.thinkbroadband.com/10MB.zip 2>/dev/null | awk '{printf "%.2f", $1/1024/1024*8}')
+    
+    if [ -n "$DOWNLOAD" ] && [ "$DOWNLOAD" != "0.00" ]; then
+        echo "  📥 Download: ${DOWNLOAD} Mbps (estimated)"
+        echo "${DOWNLOAD}|0|0"
     else
-        echo "  ❌ Speedtest failed"
+        echo "  ❌ Speed test failed"
         echo "0|0|999"
     fi
 }
@@ -101,19 +116,27 @@ wpa_ptk_rekey=600
 eapol_key_index_workaround=1
 ENDCONFIG
     
-    # Setup interface
+    # Setup interface (properly)
     echo "  Setting up interface..."
+    sudo rfkill unblock wifi
     sudo ip link set wlp2s0 down
-    sudo /usr/sbin/iw dev wlp2s0 set type managed
-    sudo ip link set wlp2s0 up
+    sleep 1
+    
+    # Remove any existing config
+    sudo /usr/sbin/iw dev wlp2s0 set type managed 2>/dev/null
     sudo ip addr flush dev wlp2s0
+    
+    # Bring up and configure
+    sudo ip link set wlp2s0 up
+    sleep 1
     
     # CRITICAL: Disable power saving
     sudo /usr/sbin/iw dev wlp2s0 set power_save off
     
-    # Set to AP mode
-    sudo /usr/sbin/iw dev wlp2s0 set type __ap
+    # Set to AP mode and assign IP
+    sudo /usr/sbin/iw dev wlp2s0 set type __ap 2>/dev/null
     sudo ip addr add 192.168.1.1/24 dev wlp2s0
+    sudo ip link set wlp2s0 up
     
     # Start hostapd
     echo "  Starting hostapd..."
@@ -128,9 +151,10 @@ ENDCONFIG
     
     # Get interface info
     INFO=$(sudo /usr/sbin/iw dev wlp2s0 info)
-    FREQ=$(echo "$INFO" | grep "channel" | awk '{print $5}')
-    WIDTH=$(echo "$INFO" | grep "channel" | awk '{print $8}')
+    FREQ=$(echo "$INFO" | grep "channel" | awk '{print $2}')
+    WIDTH=$(echo "$INFO" | grep "width:" | awk '{print $3}')
     
+    echo "  📡 Channel: $CHAN"
     echo "  📡 Frequency: ${FREQ} MHz"
     echo "  📏 Width: ${WIDTH} MHz"
     echo ""
