@@ -6,6 +6,11 @@
 
 echo "=== Updating hostapd config untuk stability 24/7 ==="
 
+# Stop hostapd first to avoid "Match already configured" error
+echo "Stopping hostapd..."
+sudo systemctl stop hostapd
+sleep 2
+
 sudo bash -c 'cat > /etc/hostapd/hostapd.conf << EOF
 # Basic Config - Tested & Working
 interface=wlp2s0
