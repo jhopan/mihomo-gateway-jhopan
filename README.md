@@ -1,340 +1,336 @@
-# 🚀 Mihomo Gateway
+# Mihomo Gateway dengan Hotspot WiFi
 
-![Version](https://img.shields.io/badge/Version-2.1-blue) ![License](https://img.shields.io/badge/License-MIT-green) ![Status](https://img.shields.io/badge/Status-Production-success)
+Gateway internet berbasis Mihomo (Clash Meta) dengan WiFi hotspot terintegrasi. Laptop menjadi gateway yang membagikan internet via hotspot WiFi dengan routing melalui proxy Mihomo.
 
-**Transparent Proxy Gateway dengan WiFi Hotspot**
+## 🎯 Fitur Utama
 
-Solusi lengkap untuk membuat WiFi hotspot dengan automatic proxy routing menggunakan Mihomo (Clash Meta).
+- **Mihomo Gateway**: Proxy traffic melalui Mihomo (Clash Meta)
+- **WiFi Hotspot**: Access Point menggunakan hostapd
+- **USB Tethering**: Internet dari HP via USB
+- **Auto Routing**: Game, streaming, sosmed dengan rule-based routing
+- **WebUI Dashboard**: Monitoring dan control via web interface
+- **CasaOS Integration**: Container management dengan CasaOS
+- **USB Watchdog**: Auto-fix USB tethering yang hang/timeout
 
----
+## 📋 Spesifikasi Sistem
 
-## ⚡ Quick Start
+- **OS**: Debian Trixie (testing)
+- **Gateway IP**: 192.168.2.1
+- **DHCP Range**: 192.168.2.10 - 192.168.2.100
+- **WiFi SSID**: Mihomo-Gateway
+- **WiFi Password**: mihomo2024
+- **WiFi Channel**: 6 (HT40 disabled untuk stabilitas)
+
+## 🚀 Quick Start
+
+### Install dari GitHub
 
 ```bash
 # Clone repository
-cd /opt
-git clone https://github.com/jhopan/mihomo-gateway-jhopan.git mihomo-gateway
-cd mihomo-gateway
+git clone https://github.com/jhopan/mihomo-gateway-jhopan.git
+cd mihomo-gateway-jhopan
 
 # Install
 sudo bash install.sh
-
-# Start hotspot
-sudo bash scripts/hotspot.sh start
 ```
 
-**Connect ke WiFi:**
-
-- SSID: `Mihomo-Gateway`
-- Password: `mihomo2024`
-- Gateway: `192.168.1.1`
-
----
-
-## ✨ Features
-
-✅ **WiFi Hotspot** - Automatic AP mode dengan WPA2  
-✅ **Transparent Proxy** - Mihomo (Clash Meta) untuk routing  
-✅ **Web UI** - Control panel untuk management  
-✅ **Auto Detection** - USB tethering & WiFi interface  
-✅ **Client Monitor** - Real-time monitoring connected devices  
-✅ **Multiple Methods** - TUN dan REDIRECT support  
-✅ **Watchdog** - Auto-restart jika hotspot down
-
----
-
-## 📋 Requirements
-
-- **OS:** Debian/Ubuntu Linux
-- **WiFi Card:** Support AP mode
-- **Internet:** USB tethering atau ethernet
-- **Packages:** hostapd, dnsmasq, iptables, php, nginx
-
----
-
-## 🎛️ Control Commands
+### Install Manual
 
 ```bash
-# Hotspot control
-sudo bash scripts/hotspot.sh start    # Start hotspot
-sudo bash scripts/hotspot.sh stop     # Stop hotspot
-sudo bash scripts/hotspot.sh restart  # Restart hotspot
-sudo bash scripts/hotspot.sh status   # Check status
-
-# Mihomo control
-sudo systemctl start mihomo           # Start proxy
-sudo systemctl stop mihomo            # Stop proxy
-sudo systemctl restart mihomo         # Restart proxy
-sudo systemctl status mihomo          # Check status
-```
-
----
-
-## 🌐 Web UI Setup
-
-```bash
-# Install web server
+# 1. Install dependencies
 sudo apt update
-sudo apt install -y nginx php-fpm php-cli php-json
+sudo apt install hostapd dnsmasq iptables nginx php-fpm git
 
-# Setup WebUI
-sudo cp -r webui/* /var/www/html/
-sudo chown -R www-data:www-data /var/www/html/
+# 2. Clone dan setup
+git clone https://github.com/jhopan/mihomo-gateway-jhopan.git /opt/mihomo-gateway
+cd /opt/mihomo-gateway
 
-# Configure Nginx
-sudo tee /etc/nginx/sites-available/default > /dev/null << 'EOF'
-server {
-    listen 80 default_server;
-    root /var/www/html;
-    index index.php index.html;
-    server_name _;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-    }
-}
-EOF
-
-# Start services
-sudo systemctl restart nginx php8.2-fpm
-sudo systemctl enable nginx php8.2-fpm
-```
-
-**Access WebUI:** `http://192.168.1.1`
-
-**Default Login:**
-
-- Username: `admin`
-- Password: `mihomo2024`
-
----
-
-## 📊 WebUI Features
-
-| Feature                 | Description                              |
-| ----------------------- | ---------------------------------------- |
-| 📊 **Dashboard**        | Status hotspot, clients, traffic monitor |
-| ⚙️ **Hotspot Settings** | Change channel, SSID, password           |
-| 👥 **Client Monitor**   | View connected devices, block/unblock    |
-| 🔧 **Proxy Config**     | Upload config, edit providers            |
-| 📈 **Speedtest**        | Test speed per channel                   |
-
----
-
-## 🔧 Configuration
-
-### WiFi Settings
-
-Edit `/etc/hostapd/hostapd.conf`:
-
-```conf
-interface=wlp2s0
-ssid=Mihomo-Gateway
-channel=6
-wpa_passphrase=mihomo2024
-```
-
-**Recommended Channels:** 1, 6, 11 (non-overlapping)
-
-### Mihomo Config
-
-Edit `/opt/mihomo-gateway/config/config.yaml`:
-
-```yaml
-tun:
-  enable: true
-  stack: system
-  dns-hijack:
-    - any:53
-```
-
-**Config Locations:**
-
-- Main: `config/config.yaml`
-- Game: `config/game.yaml`
-- Providers: `config/proxy-providers/`
-
----
-
-## 🛠️ Troubleshooting
-
-### Hotspot tidak start
-
-```bash
-# Check interfaces
-sudo bash scripts/detect-interfaces.sh
-
-# Check power saving (MUST BE OFF)
-sudo /usr/sbin/iw dev wlp2s0 get power_save
-
-# Disable power saving
-sudo /usr/sbin/iw dev wlp2s0 set power_save off
-```
-
-### Client tidak bisa connect
-
-```bash
-# Check hostapd logs
-sudo journalctl -u hostapd -n 50
-
-# Restart with clean state
-sudo bash scripts/hotspot.sh stop
-sudo rfkill unblock wifi
+# 3. Setup hotspot
 sudo bash scripts/hotspot.sh start
+
+# 4. Setup USB watchdog (auto-fix USB issues)
+sudo bash setup-usb-watchdog.sh
+
+# 5. Setup WebUI sudo permissions
+sudo bash setup-webui-sudo.sh
+
+# 6. Deploy WebUI
+sudo cp webui/api-dashboard.php /var/www/html/
 ```
 
-### Tidak ada internet
+## 🌐 Akses Services
 
-```bash
-# Check USB tethering
-ip link show | grep enx
+- **WebUI Dashboard**: http://192.168.2.1:8080
+- **CasaOS**: http://192.168.2.1
+- **Mihomo API**: http://127.0.0.1:9090 (secret: mihomo-gateway-2024)
+- **SSH**: ssh jhopan@192.168.2.1
 
-# Check NAT rules
-sudo iptables -t nat -L -n -v
-
-# Reset routing
-sudo bash scripts/routing.sh
-```
-
-### Full Diagnostic
-
-```bash
-sudo bash diagnose.sh
-```
-
----
-
-## 📁 Project Structure
+## 📁 Struktur Project
 
 ```
 mihomo-gateway/
-├── config/              # Mihomo configurations
-│   ├── config.yaml      # Main config
-│   ├── game.yaml        # Game optimized
-│   └── proxy-providers/ # Proxy lists
+├── config/
+│   ├── config.yaml              # Mihomo config
+│   ├── proxy_providers/         # VPN providers
+│   └── rule_providers/          # Routing rules
 ├── scripts/
-│   ├── hotspot.sh       # Main hotspot control ⭐
-│   ├── detect-interfaces.sh
-│   ├── client-monitor.sh
-│   ├── routing.sh
-│   └── setup.sh
-├── webui/               # Web control panel
-│   ├── index.php
-│   ├── api.php
-│   └── dashboard/
-├── install.sh           # Installation script
-├── diagnose.sh          # Diagnostic tool
-├── README.md            # This file
-└── SETUP.md             # Complete setup guide
+│   ├── hotspot.sh              # Hotspot control
+│   └── usb-watchdog.sh         # USB monitoring
+├── systemd/
+│   └── usb-watchdog.service    # Watchdog service
+├── webui/
+│   └── api-dashboard.php       # Dashboard API
+├── install.sh                   # Main installer
+├── setup-usb-watchdog.sh       # Setup USB watchdog
+├── setup-webui-sudo.sh         # Setup WebUI permissions
+├── fix-nat-now.sh              # Quick NAT fix
+├── emergency-fix-network.sh    # Emergency network reset
+├── quick-fix-hotspot.sh        # Quick hotspot fix
+├── fix-casaos.sh               # Fix CasaOS issues
+└── reinstall-casaos.sh         # Reinstall CasaOS
 ```
 
----
+## 🔧 Maintenance Scripts
 
-## 🎯 Performance Tips
-
-**For Best Speed:**
-
-- ✅ Use channel 6 (most stable)
-- ✅ Disable WiFi power saving
-- ✅ Use USB 3.0 for tethering
-- ✅ Enable QoS/WMM
-
-**For Gaming:**
-
-- ✅ Use `game.yaml` config
-- ✅ Enable TUN mode
-- ✅ Use low latency proxy
-- ✅ Direct connection for game servers
-
-**For Phone:**
-
-- ✅ Disable MAC randomization
-- ✅ Forget & reconnect if unstable
-- ✅ Keep WiFi always on
-
----
-
-## 📝 Important Notes
-
-- **WiFi Power Saving:** Harus dimatikan! (`iw dev wlp2s0 set power_save off`)
-- **MAC Randomization:** Disable di phone untuk koneksi stabil
-- **Channel:** 6 adalah default (tested paling stabil)
-- **HT40:** Enabled untuk speed 2x lipat (40 MHz vs 20 MHz)
-
----
-
-## 🚀 Auto Start on Boot
-
-Services sudah di-enable otomatis:
-
+### Hotspot Management
 ```bash
-sudo systemctl enable mihomo      # ✅ Auto-enabled
-sudo systemctl enable hostapd     # ✅ Auto-enabled
-sudo systemctl enable dnsmasq     # ✅ Auto-enabled
+# Start hotspot
+sudo bash scripts/hotspot.sh start
+
+# Stop hotspot
+sudo bash scripts/hotspot.sh stop
+
+# Restart hotspot
+sudo bash scripts/hotspot.sh restart
+
+# Check status
+sudo bash scripts/hotspot.sh status
 ```
 
-Hotspot akan start otomatis setelah boot.
+### Network Troubleshooting
+```bash
+# Quick NAT fix (USB interface changed)
+sudo bash fix-nat-now.sh
 
----
+# Emergency network fix (USB timeout/hang)
+sudo bash emergency-fix-network.sh
 
-## 📖 Documentation
+# Quick hotspot fix (conflicts)
+sudo bash quick-fix-hotspot.sh
+```
 
-- **[SETUP.md](SETUP.md)** - Complete installation & setup guide
-- **[LICENSE](LICENSE)** - MIT License
+### USB Watchdog
+```bash
+# View watchdog status
+sudo systemctl status usb-watchdog
 
----
+# View watchdog logs
+sudo journalctl -u usb-watchdog -f
+sudo tail -f /var/log/usb-watchdog.log
+
+# Restart watchdog
+sudo systemctl restart usb-watchdog
+```
+
+### CasaOS Management
+```bash
+# Fix CasaOS issues
+sudo bash fix-casaos.sh
+
+# Reinstall CasaOS (last resort)
+sudo bash reinstall-casaos.sh
+```
+
+## ⚙️ Konfigurasi
+
+### Mihomo Config (`config/config.yaml`)
+
+```yaml
+port: 7891
+socks-port: 7892
+mixed-port: 7893
+external-controller: 0.0.0.0:9090
+secret: "mihomo-gateway-2024"
+
+proxy-providers:
+  VPN-1:
+    type: file
+    path: ./proxy_providers/vpn1.yaml
+  VPN-2:
+    type: file
+    path: ./proxy_providers/vpn2.yaml
+
+proxy-groups:
+  - name: INTERNET-UMUM
+    type: fallback
+    proxies: [VPN-1, VPN-2]
+  
+  - name: STREAMING×SOSMED
+    type: select
+    proxies: [VPN-1, VPN-2]
+  
+  - name: GAME
+    type: url-test
+    proxies: [VPN-1, VPN-2]
+
+rules:
+  - DST-PORT,8080-8099,GAME        # MLBB
+  - DST-PORT,10000-10050,GAME      # Free Fire
+  - DOMAIN-SUFFIX,netflix.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,youtube.com,STREAMING×SOSMED
+  - MATCH,INTERNET-UMUM
+```
+
+### Hotspot Config
+
+Edit `scripts/hotspot.sh`:
+```bash
+SSID="Mihomo-Gateway"
+PASSWORD="mihomo2024"
+CHANNEL="6"
+IP_ADDRESS="192.168.2.1"
+DHCP_RANGE_START="192.168.2.10"
+DHCP_RANGE_END="192.168.2.100"
+```
+
+## 🐛 Troubleshooting
+
+### Problem: Internet dari hotspot tidak jalan
+**Solusi:**
+```bash
+# Cek USB interface
+ip addr show
+
+# Fix NAT routing
+sudo bash fix-nat-now.sh
+
+# Atau emergency fix
+sudo bash emergency-fix-network.sh
+```
+
+### Problem: Hotspot tidak start (NetworkManager conflict)
+**Solusi:**
+```bash
+# Quick fix
+sudo bash quick-fix-hotspot.sh
+
+# Atau restart dengan conflict cleanup
+sudo systemctl stop NetworkManager wpa_supplicant
+sudo bash scripts/hotspot.sh restart
+```
+
+### Problem: CasaOS gagal load apps
+**Solusi:**
+```bash
+# Update Docker (butuh API 1.44+)
+sudo apt update
+sudo apt install --only-upgrade docker-ce docker-ce-cli
+
+# Add user ke docker group
+sudo usermod -aG docker jhopan
+newgrp docker
+
+# Restart CasaOS
+sudo systemctl restart casaos-gateway casaos-message-bus casaos-app-management casaos
+```
+
+### Problem: USB tethering timeout (NETDEV WATCHDOG error)
+**Solusi:**
+USB Watchdog akan otomatis fix ini setiap 30 detik. Kalau masih error:
+```bash
+# Manual fix
+sudo bash emergency-fix-network.sh
+
+# Atau cabut-colok USB cable
+# Tunggu 10 detik
+# Colok lagi, lalu:
+sudo bash fix-nat-now.sh
+```
+
+## 📊 Monitoring
+
+### Check All Services
+```bash
+# Mihomo
+sudo systemctl status mihomo
+
+# Hotspot
+sudo systemctl status hostapd dnsmasq
+
+# USB Watchdog
+sudo systemctl status usb-watchdog
+
+# CasaOS
+sudo systemctl status casaos casaos-gateway
+```
+
+### View Logs
+```bash
+# Mihomo logs
+sudo journalctl -u mihomo -f
+
+# Hotspot logs
+sudo journalctl -u hostapd -f
+sudo journalctl -u dnsmasq -f
+
+# USB Watchdog logs
+sudo tail -f /var/log/usb-watchdog.log
+
+# CasaOS logs
+sudo journalctl -u casaos -f
+```
+
+### Check Network Status
+```bash
+# Check interfaces
+ip addr show
+
+# Check routing
+ip route
+
+# Check NAT rules
+sudo iptables -t nat -L -v -n
+
+# Check DHCP clients
+sudo cat /var/lib/misc/dnsmasq.leases
+
+# Check hotspot clients
+sudo hostapd_cli all_sta
+```
+
+## 🔄 Updates
+
+### Update Repository
+```bash
+cd /opt/mihomo-gateway
+git pull
+```
+
+### Update Mihomo Binary
+```bash
+# Download latest release
+wget https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-linux-amd64-v*.gz
+gunzip mihomo-linux-amd64-v*.gz
+sudo mv mihomo-linux-amd64-v* /usr/local/bin/mihomo
+sudo chmod +x /usr/local/bin/mihomo
+sudo systemctl restart mihomo
+```
 
 ## 🤝 Contributing
 
-Contributions welcome! Please:
+Feel free to submit issues dan pull requests!
 
-1. Fork repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Open pull request
+## 📝 License
 
----
+MIT License
 
-## 📞 Support
+## 👤 Author
 
-**Issues?** Check:
+jhopan - [GitHub](https://github.com/jhopan)
 
-1. Run `sudo bash diagnose.sh`
-2. Check logs: `sudo journalctl -u hostapd -n 50`
-3. Verify power saving OFF
-4. Test different channel
+## 🙏 Credits
 
----
-
-## ⚖️ License
-
-MIT License - See [LICENSE](LICENSE) file
-
----
-
-## 🎉 Quick Commands
-
-```bash
-# Start everything
-sudo bash scripts/hotspot.sh start && sudo systemctl start mihomo
-
-# Stop everything
-sudo bash scripts/hotspot.sh stop && sudo systemctl stop mihomo
-
-# Status check
-sudo bash scripts/hotspot.sh status
-sudo systemctl status mihomo
-
-# WebUI
-# http://192.168.1.1
-```
-
----
-
-**Made with ❤️ for easy network management**
+- [Mihomo (Clash Meta)](https://github.com/MetaCubeX/mihomo)
+- [CasaOS](https://github.com/IceWhaleTech/CasaOS)
+- [hostapd](https://w1.fi/hostapd/)
+- [dnsmasq](http://www.thekelleys.org.uk/dnsmasq/doc.html)

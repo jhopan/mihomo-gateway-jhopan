@@ -20,7 +20,7 @@ echo "USB: $USB"
 # Configure WiFi interface
 sudo ip addr flush dev $WIFI
 sudo ip link set $WIFI up
-sudo ip addr add 192.168.1.1/24 dev $WIFI
+sudo ip addr add 192.168.2.1/24 dev $WIFI
 
 # Enable IP forwarding
 sudo sysctl -w net.ipv4.ip_forward=1 > /dev/null

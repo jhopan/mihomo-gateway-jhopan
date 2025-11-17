@@ -10,10 +10,10 @@ INTERNET_INTERFACE=""       # Auto-detect
 SSID="Mihomo-Gateway"       # Hotspot SSID
 PASSWORD="mihomo2024"       # Hotspot password (min 8 chars)
 CHANNEL="auto"              # WiFi channel (auto-select best, fallback to 11)
-IP_ADDRESS="192.168.1.1"    # Hotspot IP (easy to remember!)
-DHCP_RANGE_START="192.168.1.10"
-DHCP_RANGE_END="192.168.1.100"
-SUBNET="192.168.1.0/24"
+IP_ADDRESS="192.168.2.1"    # Hotspot IP (easy to remember!)
+DHCP_RANGE_START="192.168.2.10"
+DHCP_RANGE_END="192.168.2.100"
+SUBNET="192.168.2.0/24"
 
 # Script directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
