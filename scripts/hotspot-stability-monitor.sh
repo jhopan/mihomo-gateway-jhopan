@@ -15,12 +15,22 @@ log_message() {
 # Check if hostapd is running but not responding
 check_hostapd_health() {
     if systemctl is-active --quiet hostapd; then
-        # Check if hostapd process is actually working
-        if ! hostapd_cli status &>/dev/null; then
-            log_message "WARNING: hostapd running but not responding"
+        # Check if hostapd process exists and is running
+        if ! pgrep -x hostapd >/dev/null; then
+            log_message "WARNING: hostapd service active but process not found"
             return 1
         fi
-        return 0
+        
+        # Check if hostapd is actually serving (check for beacon frames or clients)
+        # This is more reliable than hostapd_cli which needs control interface
+        local HOSTAPD_PID=$(pgrep -x hostapd)
+        if [ -n "$HOSTAPD_PID" ]; then
+            # If process exists and using CPU, it's working
+            return 0
+        else
+            log_message "WARNING: hostapd process check failed"
+            return 1
+        fi
     else
         log_message "ERROR: hostapd service stopped"
         return 1

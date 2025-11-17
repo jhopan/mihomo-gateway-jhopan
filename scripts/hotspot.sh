@@ -200,11 +200,13 @@ ieee80211d=1
 beacon_int=100
 dtim_period=2
 max_num_sta=10
-rts_threshold=2347
-fragm_threshold=2346
 
 # Timeouts (prevent premature disconnects)
 ap_max_inactivity=300
+
+# Control interface for monitoring
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
 EOF
 
     # Add HT capabilities only if supported
@@ -237,6 +239,8 @@ wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
 country_code=ID
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
 EOF
     fi
     
