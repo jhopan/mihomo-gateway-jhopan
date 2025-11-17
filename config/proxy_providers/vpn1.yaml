@@ -1,0 +1,37 @@
+# VPN 1 - Server Indonesia (untuk Game)
+# Path: /etc/mihomo/proxy_providers/vpn1.yaml
+
+proxies:
+  # Contoh server Indonesia (ganti dengan server kamu)
+  - name: "ID-Server-1"
+    type: vmess
+    server: your-server-1.com
+    port: 443
+    uuid: your-uuid-here
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: false
+    network: ws
+    ws-opts:
+      path: /vmess
+      headers:
+        Host: your-server-1.com
+
+  - name: "ID-Server-2"
+    type: vmess
+    server: your-server-2.com
+    port: 443
+    uuid: your-uuid-here
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: false
+    network: ws
+    ws-opts:
+      path: /vmess
+      headers:
+        Host: your-server-2.com
+
+  # Tambahkan server Indonesia lainnya di sini
+  # Prioritas: Server dengan ping rendah untuk gaming

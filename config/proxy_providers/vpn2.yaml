@@ -1,0 +1,37 @@
+# VPN 2 - Server Global (untuk Streaming & Sosmed)
+# Path: /etc/mihomo/proxy_providers/vpn2.yaml
+
+proxies:
+  # Contoh server global (ganti dengan server kamu)
+  - name: "SG-Server-1"
+    type: vmess
+    server: your-sg-server.com
+    port: 443
+    uuid: your-uuid-here
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: false
+    network: ws
+    ws-opts:
+      path: /vmess
+      headers:
+        Host: your-sg-server.com
+
+  - name: "US-Server-1"
+    type: vmess
+    server: your-us-server.com
+    port: 443
+    uuid: your-uuid-here
+    alterId: 0
+    cipher: auto
+    tls: true
+    skip-cert-verify: false
+    network: ws
+    ws-opts:
+      path: /vmess
+      headers:
+        Host: your-us-server.com
+
+  # Tambahkan server global lainnya di sini
+  # Prioritas: Server dengan kecepatan tinggi untuk streaming

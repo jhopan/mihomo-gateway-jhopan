@@ -1,0 +1,337 @@
+# =========================
+# 🔧 PORTS & CORE SETTINGS
+# =========================
+# Mihomo Gateway Configuration - Optimized for Gaming & Streaming
+# Linux version (adapted from Android Magisk Box)
+
+port: 7890              # HTTP proxy port
+socks-port: 7891        # SOCKS5 proxy port
+mixed-port: 7890        # Mixed port (HTTP + SOCKS5)
+redir-port: 9797        # Redirect port (for REDIRECT method)
+
+mode: rule
+allow-lan: true
+bind-address: "*"
+
+# Log level: silent / error / warning / info / debug
+log-level: warning      # Warning level untuk pantau error ringan
+
+# External Controller (API)
+external-controller: 0.0.0.0:9090
+external-ui: /var/www/html/mihomo-ui/dashboard
+secret: "mihomo-gateway-2024"  # Ganti ini!
+
+# IPv6 support (disabled untuk stabilitas)
+ipv6: false
+
+# Performance settings
+unified-delay: true
+tcp-concurrent: true
+
+# Routing mark
+routing-mark: 666
+
+# =========================
+# 🔖 PROFILE
+# =========================
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# Geodata settings
+geodata-mode: true
+geox-url:
+  geoip: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geosite: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+
+# =========================
+# 🌐 DNS SETTINGS
+# =========================
+dns:
+  enable: true
+  prefer-h3: false
+  listen: 0.0.0.0:1053
+  ipv6: false               # Disabled untuk stabilitas
+  use-hosts: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+
+  # Default nameserver (bootstrap DNS)
+  default-nameserver:
+    - 223.5.5.5             # DNS lokal cepat (Alibaba)
+    - 1.1.1.1
+    - 8.8.8.8
+
+  # Main nameserver
+  nameserver:
+    - 223.5.5.5
+    - 1.1.1.1
+    - 8.8.8.8
+
+  # Fallback nameserver
+  fallback:
+    - 9.9.9.9
+    - 1.0.0.1
+    - 8.8.4.4
+
+  # Fake-IP filter (PENTING!)
+  fake-ip-filter:
+    # Sistem lokal (WAJIB)
+    - "+.lan"
+    - "+.local"
+    - "+.localhost"
+    - "+.localdomain"
+    - "192.168.1.1"         # Gateway IP
+    - "mihomo-gateway.local"
+
+    # NTP / sinkronisasi waktu (WAJIB)
+    - "+.ntp.org"
+    - "+.pool.ntp.org"
+    - "+.time.windows.com"
+    - "+.time.apple.com"
+    - "+.time.google.com"
+
+    # Google push notif (WAJIB)
+    - "mtalk.google.com"
+    - "mtalk4.google.com"
+
+    # STUN untuk VoIP/game (WAJIB)
+    - "+.stun.*"
+    - "+.stun.playstation.net"
+
+    # GitHub (WAJIB)
+    - "+.github.com"
+    - "+.githubusercontent.com"
+    - "+.ghcr.io"
+
+    # GitLab (WAJIB)
+    - "+.gitlab.com"
+
+    # Docker registry (WAJIB)
+    - "+.docker.com"
+    - "+.docker.io"
+    - "+.docker.internal"
+    - "+.registry-1.docker.io"
+
+    # CDN provider penting (WAJIB real DNS)
+    - "+.cloudflare.com"
+    - "+.cloudflare-dns.com"
+    - "+.akamaihd.net"
+    - "+.cloudfront.net"
+    - "+.fastly.net"
+
+    # Streaming (WAJIB)
+    - "+.googlevideo.com"
+    - "+.nflxvideo.net"
+    - "+.netflix.com"
+
+    # Gaming platforms
+    - "*.battlenet.com.cn"
+    - "*.battlenet.com"
+    - "*.blzstatic.cn"
+    - "*.battle.net"
+    - "+.srv.nintendo.net"
+    - "+.xboxlive.com"
+    - "xbox.*.microsoft.com"
+
+    # Services
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - "msftconnecttest.com"
+    - "+.casaos.local"
+    - "localhost.ptlogin2.qq.com"
+
+    # Fix bug Google Lens
+    - "lens.l.google.com"
+
+  # Fallback filter
+  fallback-filter:
+    geoip: true
+    geoip-code: ID
+    ipcidr:
+      - 0.0.0.0/8
+      - 10.0.0.0/8
+      - 127.0.0.0/8
+      - 169.254.0.0/16
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+      - 224.0.0.0/4
+      - 240.0.0.0/4
+      - 255.255.255.255/32
+    domain:
+      - "+.google.com"
+      - "+.facebook.com"
+      - "+.youtube.com"
+      - "+.githubusercontent.com"
+      - "+.googlevideo.com"
+
+# =========================
+# 🧩 TUN MODE
+# =========================
+tun:
+  enable: true              # Enabled sesuai request user
+  device: utun
+  mtu: 1500                 # Turunkan ke 1500 biar stabil di ISP Indonesia
+  stack: system
+  strict-route: false
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  auto-route: true
+  auto-detect-interface: true
+
+# =========================
+# 🚀 PROXY PROVIDERS
+# =========================
+proxy-providers:
+  VPN-1:
+    type: file
+    path: /etc/mihomo/proxy_providers/vpn1.yaml
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 30
+
+  VPN-2:
+    type: file
+    path: /etc/mihomo/proxy_providers/vpn2.yaml
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 30
+
+# =========================
+# 🎯 PROXY GROUPS
+# =========================
+proxy-groups:
+  # Internet umum - auto fallback
+  - name: INTERNET-UMUM
+    type: fallback
+    disable-udp: false
+    use:
+      - VPN-1
+      - VPN-2
+    url: http://www.gstatic.com/generate_204
+    interval: 60
+
+  # Streaming & Social Media - manual select
+  - name: STREAMING×SOSMED
+    type: select
+    disable-udp: false
+    use:
+      - VPN-2
+      - VPN-1
+
+  # Situs X - manual select
+  - name: Situs X
+    type: select
+    disable-udp: false
+    use:
+      - VPN-2
+
+  # Game - auto select fastest from VPN-1
+  - name: GAME
+    type: url-test
+    disable-udp: false
+    use:
+      - VPN-1
+    url: http://www.gstatic.com/generate_204
+    interval: 30
+    tolerance: 50
+
+# =========================
+# ⚙️ RULES
+# =========================
+rules:
+  # Proteksi fake-ip (WAJIB)
+  - IP-CIDR,198.18.0.1/16,REJECT,no-resolve
+
+  # Blokir DoH bypass
+  - DOMAIN-SUFFIX,dns.google,REJECT
+  - DOMAIN-SUFFIX,cloudflare-dns.com,REJECT
+
+  # LAN & Private network (always direct)
+  - IP-CIDR,192.168.1.0/24,DIRECT,no-resolve        # Hotspot network
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve            # Private network
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve         # Private + Docker
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve        # Private network
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve           # Localhost
+  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve           # Multicast
+  - IP-CIDR,240.0.0.0/4,DIRECT,no-resolve           # Reserved
+
+  # Mihomo Web UI (direct)
+  - DST-PORT,9090,DIRECT                            # Mihomo API
+
+  # Bypass push notif Google (biar gak ganggu ping)
+  - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
+  - DOMAIN-SUFFIX,mtalk4.google.com,DIRECT
+  - DST-PORT,5228,DIRECT
+
+  # === GAME RULES (MLBB / Magic Chess / FF / Funny Fighter) ===
+  
+  # Game Ports UDP
+  - DST-PORT,5000-5221,GAME,udp,no-resolve          # MLBB range 1
+  - DST-PORT,5224-5287,GAME,udp,no-resolve          # MLBB range 2
+  - DST-PORT,5289-5700,GAME,udp,no-resolve          # MLBB range 3
+  - DST-PORT,8443,GAME,udp,no-resolve               # MLBB HTTPS
+  - DST-PORT,9000-9010,GAME,udp,no-resolve          # Game server
+  - DST-PORT,10000-10100,GAME,udp,no-resolve        # Game server range
+  - DST-PORT,5055-5058,GAME,udp,no-resolve          # FF range
+  - DST-PORT,6006-6012,GAME,udp,no-resolve          # FF range 2
+
+  # Game Server IPs (MLBB / FF / Funny Fighter)
+  - IP-CIDR,103.10.124.0/23,GAME,no-resolve         # Moonton Indonesia
+  - IP-CIDR,103.10.125.0/24,GAME,no-resolve         # Moonton Indonesia
+  - IP-CIDR,13.213.0.0/16,GAME,no-resolve           # AWS Singapore (MLBB)
+  - IP-CIDR,45.64.0.0/16,GAME,no-resolve            # Game servers SEA
+  - IP-CIDR,52.74.0.0/16,GAME,no-resolve            # AWS Singapore
+  - IP-CIDR,119.81.0.0/16,GAME,no-resolve           # Tencent Cloud
+  - IP-CIDR,161.117.0.0/16,GAME,no-resolve          # Game servers
+  - IP-CIDR,43.249.0.0/16,GAME,no-resolve           # SEA servers
+  - IP-CIDR,103.11.128.0/22,GAME,no-resolve         # Indonesia game
+  - IP-CIDR,203.205.0.0/16,GAME,no-resolve          # SEA CDN
+  - IP-CIDR,182.254.0.0/16,GAME,no-resolve          # Tencent
+
+  # === STREAMING & SOCIAL MEDIA ===
+  
+  # YouTube
+  - DOMAIN-SUFFIX,youtube.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,googlevideo.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,ytimg.com,STREAMING×SOSMED
+  
+  # Instagram
+  - DOMAIN-SUFFIX,instagram.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,cdninstagram.com,STREAMING×SOSMED
+  
+  # TikTok
+  - DOMAIN-SUFFIX,tiktok.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,tiktokcdn.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,tiktokv.com,STREAMING×SOSMED
+  
+  # Telegram
+  - DOMAIN-SUFFIX,telegram.org,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,telegra.ph,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,t.me,STREAMING×SOSMED
+  
+  # Facebook
+  - DOMAIN-SUFFIX,facebook.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,fbcdn.net,STREAMING×SOSMED
+  
+  # Spotify
+  - DOMAIN-SUFFIX,spotify.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,scdn.co,STREAMING×SOSMED
+  
+  # Netflix
+  - DOMAIN-SUFFIX,netflix.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,nflxvideo.net,STREAMING×SOSMED
+
+  # === SITUS X ===
+  - DOMAIN-SUFFIX,pornhub.com,Situs X
+  - DOMAIN-SUFFIX,phncdn.com,Situs X
+  - DOMAIN-SUFFIX,phprcdn.com,Situs X
+  - DOMAIN-SUFFIX,xvideos.com,Situs X
+  - DOMAIN-SUFFIX,xnxx.com,Situs X
+
+  # === DEFAULT ===
+  - MATCH,INTERNET-UMUM

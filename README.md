@@ -66,6 +66,7 @@ _Support Multiple Methods • Easy Setup • Production Ready_
 - 👥 **Client Monitoring** - See connected devices in real-time
 - 📌 **Static IP Assignment** - Set fixed IP for your devices
 - 🚀 **Speed Test** - Integrated speedtest-cli in dashboard
+- 🎮 **Game Optimized** - Config untuk MLBB, FF, Funny Fighter
 
 ## 🖥️ System Requirements
 

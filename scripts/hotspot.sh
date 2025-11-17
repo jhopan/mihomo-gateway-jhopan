@@ -9,7 +9,7 @@ WIFI_INTERFACE=""           # Auto-detect
 INTERNET_INTERFACE=""       # Auto-detect  
 SSID="Mihomo-Gateway"       # Hotspot SSID
 PASSWORD="mihomo2024"       # Hotspot password (min 8 chars)
-CHANNEL="auto"              # WiFi channel (auto-select best)
+CHANNEL="auto"              # WiFi channel (auto-select best, fallback to 11)
 IP_ADDRESS="192.168.1.1"    # Hotspot IP (easy to remember!)
 DHCP_RANGE_START="192.168.1.10"
 DHCP_RANGE_END="192.168.1.100"
@@ -86,12 +86,12 @@ auto_select_channel() {
             if [ -n "$CHANNEL" ] && [[ "$CHANNEL" =~ ^[0-9]+$ ]]; then
                 print_info "✓ Selected channel: $CHANNEL"
             else
-                print_warn "Channel auto-selection failed, using channel 6"
-                CHANNEL="6"
+                print_warn "Channel auto-selection failed, using channel 11"
+                CHANNEL="11"
             fi
         else
-            print_warn "Channel selection script not found, using channel 6"
-            CHANNEL="6"
+            print_warn "Channel selection script not found, using channel 11"
+            CHANNEL="11"
         fi
     else
         # Verify channel is supported
@@ -199,10 +199,16 @@ setup_interface() {
     systemctl stop hostapd 2>/dev/null || true
     systemctl stop dnsmasq 2>/dev/null || true
     
+    # Wait a bit
+    sleep 1
+    
     # Configure static IP
-    ip addr flush dev $WIFI_INTERFACE
-    ip addr add $IP_ADDRESS/24 dev $WIFI_INTERFACE
-    ip link set $WIFI_INTERFACE up
+    ip addr flush dev $WIFI_INTERFACE 2>/dev/null || true
+    ip link set $WIFI_INTERFACE down 2>/dev/null || true
+    sleep 1
+    ip link set $WIFI_INTERFACE up 2>/dev/null || true
+    sleep 1
+    ip addr add ${IP_ADDRESS}/24 dev $WIFI_INTERFACE 2>/dev/null || true
     
     print_info "Interface configured with IP: $IP_ADDRESS"
 }
