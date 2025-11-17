@@ -42,30 +42,78 @@ sudo systemctl reset-failed casaos.service || true
 sudo systemctl reset-failed casaos-user-service.service || true
 sudo systemctl reset-failed casaos-message-bus.service || true
 
-# Step 4: Fix permissions
-echo "[4/6] Fixing CasaOS permissions..."
+# Step 4: Check if casaos user exists, create if needed
+echo "[4/6] Checking CasaOS user..."
+if ! id casaos &>/dev/null; then
+    echo "  - CasaOS user not found, creating..."
+    sudo useradd -r -s /usr/sbin/nologin -d /var/lib/casaos casaos || true
+else
+    echo "  - CasaOS user exists"
+fi
+
+# Step 5: Fix permissions
+echo "[5/6] Fixing CasaOS permissions..."
+sudo mkdir -p /etc/casaos /var/lib/casaos
 sudo chown -R root:root /etc/casaos/ || true
 sudo chmod -R 755 /etc/casaos/ || true
 sudo chown -R casaos:casaos /var/lib/casaos/ || true
 sudo chmod -R 755 /var/lib/casaos/ || true
 
-# Step 5: Reinstall CasaOS if needed
-echo "[5/6] Checking CasaOS installation..."
+# Step 6: Check CasaOS installation and service files
+echo "[6/6] Checking CasaOS installation..."
+CASAOS_MISSING=0
+
 if ! command -v casaos &>/dev/null; then
-    echo "  - CasaOS binary not found, reinstalling..."
-    curl -fsSL https://get.casaos.io | sudo bash
-else
-    echo "  - CasaOS binary found: $(which casaos)"
+    echo "  - CasaOS binary not found"
+    CASAOS_MISSING=1
 fi
 
-# Step 6: Start CasaOS services
-echo "[6/6] Starting CasaOS services..."
+if [ ! -f /usr/lib/systemd/system/casaos.service ]; then
+    echo "  - CasaOS service files not found"
+    CASAOS_MISSING=1
+fi
+
+if [ $CASAOS_MISSING -eq 1 ]; then
+    echo ""
+    echo "  CasaOS needs to be reinstalled."
+    echo "  Run: curl -fsSL https://get.casaos.io | sudo bash"
+    echo ""
+    echo "  After reinstall, run this script again."
+    exit 1
+else
+    echo "  - CasaOS binary found: $(which casaos)"
+    echo "  - CasaOS services found"
+fi
+
+# Step 7: Start CasaOS services
+echo "[7/7] Starting CasaOS services..."
 sudo systemctl daemon-reload
-sudo systemctl start casaos-message-bus.service
+
+echo "  - Starting casaos-message-bus..."
+if ! sudo systemctl start casaos-message-bus.service; then
+    echo "    ERROR: Failed to start message-bus"
+    echo "    Checking logs:"
+    sudo journalctl -u casaos-message-bus.service -n 20 --no-pager
+    exit 1
+fi
 sleep 2
-sudo systemctl start casaos-user-service.service
+
+echo "  - Starting casaos-user-service..."
+if ! sudo systemctl start casaos-user-service.service; then
+    echo "    ERROR: Failed to start user-service"
+    echo "    Checking logs:"
+    sudo journalctl -u casaos-user-service.service -n 20 --no-pager
+    exit 1
+fi
 sleep 2
-sudo systemctl start casaos.service
+
+echo "  - Starting casaos main service..."
+if ! sudo systemctl start casaos.service; then
+    echo "    ERROR: Failed to start casaos"
+    echo "    Checking logs:"
+    sudo journalctl -u casaos.service -n 20 --no-pager
+    exit 1
+fi
 sleep 3
 
 echo ""
