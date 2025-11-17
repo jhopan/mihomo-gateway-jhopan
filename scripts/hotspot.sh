@@ -218,24 +218,24 @@ setup_iptables() {
     print_info "Configuring iptables for hotspot..."
     
     # Enable IP forwarding
-    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv4.ip_forward=1 >/dev/null 2>&1
     
     # Clear existing rules for this interface
-    iptables -D FORWARD -i $WIFI_INTERFACE -o $INTERNET_INTERFACE -j ACCEPT 2>/dev/null || true
-    iptables -D FORWARD -i $INTERNET_INTERFACE -o $WIFI_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || true
-    iptables -t nat -D POSTROUTING -o $INTERNET_INTERFACE -j MASQUERADE 2>/dev/null || true
+    iptables -D FORWARD -i "$WIFI_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT 2>/dev/null || true
+    iptables -D FORWARD -i "$INTERNET_INTERFACE" -o "$WIFI_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || true
+    iptables -t nat -D POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE 2>/dev/null || true
     
-    # Add new rules
-    iptables -A FORWARD -i $WIFI_INTERFACE -o $INTERNET_INTERFACE -j ACCEPT
-    iptables -A FORWARD -i $INTERNET_INTERFACE -o $WIFI_INTERFACE -m state --state RELATED,ESTABLISHED -j ACCEPT
-    iptables -t nat -A POSTROUTING -o $INTERNET_INTERFACE -j MASQUERADE
+    # Add new rules with proper quoting
+    iptables -A FORWARD -i "$WIFI_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT
+    iptables -A FORWARD -i "$INTERNET_INTERFACE" -o "$WIFI_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    iptables -t nat -A POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE
     
-    # Save rules
-    if command -v iptables-save &> /dev/null; then
-        iptables-save > /etc/iptables/rules.v4
+    # Verify rules added
+    if iptables -t nat -L POSTROUTING | grep -q MASQUERADE; then
+        print_info "iptables configured successfully"
+    else
+        print_warn "iptables rules may not be applied correctly"
     fi
-    
-    print_info "iptables configured"
 }
 
 # Start hotspot
@@ -293,11 +293,18 @@ start_hotspot() {
 stop_hotspot() {
     print_info "Stopping hotspot..."
     
-    systemctl stop hostapd
-    systemctl stop dnsmasq
+    systemctl stop hostapd 2>/dev/null || true
+    systemctl stop dnsmasq 2>/dev/null || true
     
-    # Remove IP address
-    ip addr flush dev $WIFI_INTERFACE
+    # Auto-detect interface if not set
+    if [ -z "$WIFI_INTERFACE" ]; then
+        auto_detect_interfaces 2>/dev/null || true
+    fi
+    
+    # Remove IP address if interface exists
+    if [ -n "$WIFI_INTERFACE" ] && ip link show $WIFI_INTERFACE &>/dev/null; then
+        ip addr flush dev $WIFI_INTERFACE 2>/dev/null || true
+    fi
     
     print_info "Hotspot stopped"
 }
