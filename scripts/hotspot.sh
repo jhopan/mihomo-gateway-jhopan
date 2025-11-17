@@ -312,6 +312,8 @@ start_hotspot() {
     auto_select_channel
     
     # Setup everything
+    setup_hostapd
+    setup_dnsmasq
     setup_interface
     setup_iptables
     
