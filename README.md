@@ -110,7 +110,25 @@ sudo nano /etc/mihomo/config.yaml
 sudo nano /etc/mihomo/proxy_providers/custom.yaml
 ```
 
-### 4️⃣ Setup Routing & Services
+### 4️⃣ Setup Mihomo Service
+
+```bash
+# Create log directory
+sudo mkdir -p /var/log/mihomo
+
+# Copy service file
+sudo cp scripts/mihomo.service /etc/systemd/system/
+
+# Reload systemd and enable service
+sudo systemctl daemon-reload
+sudo systemctl enable mihomo
+sudo systemctl start mihomo
+
+# Check status
+sudo systemctl status mihomo
+```
+
+### 5️⃣ Setup Routing & Hotspot
 
 ```bash
 # Setup iptables (REDIRECT method)
@@ -119,12 +137,14 @@ sudo bash scripts/routing-enhanced.sh redirect
 # Setup hotspot
 sudo bash scripts/hotspot.sh setup
 
-# Start Mihomo service
-sudo systemctl enable mihomo
-sudo systemctl start mihomo
+# Start hotspot
+sudo bash scripts/hotspot.sh start
+
+# Check hotspot status
+sudo bash scripts/hotspot.sh status
 ```
 
-### 5️⃣ Access Web UI
+### 6️⃣ Access Web UI
 
 ```
 http://192.168.1.1:9090
@@ -133,6 +153,32 @@ http://192.168.1.1:9090
 **Default credentials:**
 
 - Secret: `mihomo-gateway-2024` (ganti di config.yaml!)
+
+### 7️⃣ Setup Additional Features (Optional)
+
+```bash
+# Install speedtest-cli
+sudo apt install speedtest-cli -y
+
+# Setup hotspot watchdog (always-on)
+sudo cp scripts/hotspot-watchdog.service /etc/systemd/system/
+sudo chmod +x scripts/hotspot-watchdog.sh
+sudo systemctl daemon-reload
+sudo systemctl enable hotspot-watchdog
+sudo systemctl start hotspot-watchdog
+
+# Setup client monitoring & speedtest
+sudo chmod +x scripts/client-monitor.sh
+sudo chmod +x scripts/speedtest-api.sh
+
+# Add static IP for your phone (example)
+# First, connect phone and get MAC address:
+sudo bash scripts/client-monitor.sh list
+# Then add static IP:
+# sudo bash scripts/client-monitor.sh add-static YOUR_MAC_ADDRESS 192.168.1.100 MyPhone
+```
+
+**📖 Detailed guide:** See [docs/SETUP_NEW_FEATURES.md](docs/SETUP_NEW_FEATURES.md)
 
 ## 📊 Dashboard
 

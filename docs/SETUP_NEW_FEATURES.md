@@ -32,6 +32,7 @@ sudo systemctl status hotspot-watchdog
 ```
 
 Watchdog akan:
+
 - 🔍 Check hotspot setiap 30 detik
 - 🔄 Auto-restart jika mati
 - 📝 Log ke `/var/log/hotspot-watchdog.log`
@@ -50,6 +51,7 @@ sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh add-static aa:bb:cc:dd:e
 ```
 
 **Cara dapat MAC address HP kamu:**
+
 1. Connect HP ke hotspot
 2. Jalankan: `sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh list`
 3. Lihat MAC address HP kamu
@@ -76,6 +78,7 @@ mihomo -v
 ### 👥 Connected Clients Monitor
 
 **CLI Commands:**
+
 ```bash
 # List current clients
 sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh list
@@ -91,6 +94,7 @@ sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh static
 ```
 
 **Web Dashboard:**
+
 - Open Web UI → Navigate to "👥 Connected Clients"
 - See all connected devices with MAC, IP, hostname
 - Add static IP directly from dashboard
@@ -99,6 +103,7 @@ sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh static
 ### 🚀 Speed Test
 
 **CLI Commands:**
+
 ```bash
 # Run speedtest
 sudo bash /opt/mihomo-gateway/scripts/speedtest-api.sh run
@@ -111,6 +116,7 @@ sudo bash /opt/mihomo-gateway/scripts/speedtest-api.sh simple
 ```
 
 **Web Dashboard:**
+
 - Open Web UI → Navigate to "🚀 Speed Test"
 - Click "Run Speed Test" button
 - Wait for results (10-30 seconds)
@@ -119,6 +125,7 @@ sudo bash /opt/mihomo-gateway/scripts/speedtest-api.sh simple
 ### 📡 Hotspot Always-On
 
 **Manual Commands:**
+
 ```bash
 # Check hotspot status
 sudo bash /opt/mihomo-gateway/scripts/hotspot-watchdog.sh check
@@ -135,12 +142,14 @@ Watchdog runs automatically in background!
 ## 📝 Example: Setup Static IP for Phone
 
 **Step 1: Find your phone MAC address**
+
 ```bash
 # Connect phone to hotspot first
 sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh list
 ```
 
 Output:
+
 ```
 ===================================
   Connected Clients (Hotspot)
@@ -151,21 +160,25 @@ aa:bb:cc:dd:ee:ff  192.168.1.52    MyPhone              REACHABLE
 ```
 
 **Step 2: Add static IP**
+
 ```bash
 sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh add-static aa:bb:cc:dd:ee:ff 192.168.1.100 MyPhone
 ```
 
 **Step 3: Reconnect phone**
+
 - Disconnect from hotspot
 - Connect again
 - Check IP: should be 192.168.1.100 now!
 
 **Step 4: Verify**
+
 ```bash
 sudo bash /opt/mihomo-gateway/scripts/client-monitor.sh static
 ```
 
 Output:
+
 ```
 ===================================
   Static IP Leases
@@ -182,6 +195,7 @@ Done! HP kamu sekarang akan selalu dapat IP `192.168.1.100` 🎉
 ### Hotspot Watchdog Config
 
 Edit `/opt/mihomo-gateway/scripts/hotspot-watchdog.sh`:
+
 ```bash
 CHECK_INTERVAL=30  # Check every 30 seconds (bisa diubah)
 MAX_RETRIES=3      # Max retry attempts before giving up
@@ -193,11 +207,13 @@ LOG_FILE="/var/log/hotspot-watchdog.log"
 File: `/etc/dnsmasq.d/static-leases.conf`
 
 Format:
+
 ```
 dhcp-host=MAC_ADDRESS,IP_ADDRESS,HOSTNAME,infinite
 ```
 
 Example:
+
 ```
 dhcp-host=aa:bb:cc:dd:ee:ff,192.168.1.100,MyPhone,infinite
 dhcp-host=11:22:33:44:55:66,192.168.1.101,Laptop,infinite
@@ -206,11 +222,13 @@ dhcp-host=11:22:33:44:55:66,192.168.1.101,Laptop,infinite
 ## 📊 Web Dashboard Access
 
 After setup, access dashboard at:
+
 ```
 http://192.168.1.1
 ```
 
 **New menu items:**
+
 - 👥 **Connected Clients** - See all devices, add static IP
 - 🚀 **Speed Test** - Run internet speed test
 - 📡 **Hotspot** - (existing) Hotspot management
@@ -218,6 +236,7 @@ http://192.168.1.1
 ## 🐛 Troubleshooting
 
 ### Watchdog not starting
+
 ```bash
 # Check logs
 sudo journalctl -u hotspot-watchdog -n 50
@@ -230,6 +249,7 @@ ls -la /opt/mihomo-gateway/scripts/hotspot-watchdog.sh
 ```
 
 ### Speedtest not working
+
 ```bash
 # Install speedtest-cli
 sudo apt install speedtest-cli -y
@@ -242,6 +262,7 @@ bash /opt/mihomo-gateway/scripts/speedtest-api.sh simple
 ```
 
 ### Static IP not applied
+
 ```bash
 # Check dnsmasq config
 sudo cat /etc/dnsmasq.d/static-leases.conf
@@ -253,6 +274,7 @@ sudo systemctl restart dnsmasq
 ```
 
 ### Clients not showing
+
 ```bash
 # Check if wlan0 is up
 ip addr show wlan0

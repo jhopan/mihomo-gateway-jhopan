@@ -175,14 +175,29 @@ select_best_channel() {
         fi
     fi
     
+    # Priority channels to try (best to worst)
+    local priority_channels=(1 6 11 3 9 13 2 7 10 4 8 12 5)
+    
     # Auto-select best channel
     print_info "Analyzing network environment..."
-    best_channel=$(analyze_channels "$interface" "${supported_channels[@]}")
+    best_channel=$(analyze_channels "$interface" "${supported_channels[@]}" 2>/dev/null)
+    
+    if [ -z "$best_channel" ] || [ "$best_channel" == "0" ]; then
+        print_warn "Analysis failed, trying priority channels..."
+        # Try priority channels in order
+        for ch in "${priority_channels[@]}"; do
+            if [[ " ${supported_channels[*]} " =~ " ${ch} " ]]; then
+                best_channel=$ch
+                print_info "Selected from priority list: $best_channel"
+                break
+            fi
+        done
+    fi
     
     if [ -z "$best_channel" ]; then
-        # Fallback to first supported channel
+        # Final fallback to first supported channel
         best_channel=${supported_channels[0]}
-        print_warn "Could not determine best channel, using: $best_channel"
+        print_warn "Using fallback channel: $best_channel"
     else
         print_info "Best channel determined: $best_channel"
     fi
