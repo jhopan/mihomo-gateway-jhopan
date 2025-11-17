@@ -24,6 +24,7 @@ sudo bash scripts/hotspot.sh start
 ```
 
 **Connect ke WiFi:**
+
 - SSID: `Mihomo-Gateway`
 - Password: `mihomo2024`
 - Gateway: `192.168.1.1`
@@ -38,7 +39,7 @@ sudo bash scripts/hotspot.sh start
 ✅ **Auto Detection** - USB tethering & WiFi interface  
 ✅ **Client Monitor** - Real-time monitoring connected devices  
 ✅ **Multiple Methods** - TUN dan REDIRECT support  
-✅ **Watchdog** - Auto-restart jika hotspot down  
+✅ **Watchdog** - Auto-restart jika hotspot down
 
 ---
 
@@ -87,11 +88,11 @@ server {
     root /var/www/html;
     index index.php index.html;
     server_name _;
-    
+
     location / {
         try_files $uri $uri/ =404;
     }
-    
+
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
@@ -107,6 +108,7 @@ sudo systemctl enable nginx php8.2-fpm
 **Access WebUI:** `http://192.168.1.1`
 
 **Default Login:**
+
 - Username: `admin`
 - Password: `mihomo2024`
 
@@ -114,13 +116,13 @@ sudo systemctl enable nginx php8.2-fpm
 
 ## 📊 WebUI Features
 
-| Feature | Description |
-|---------|-------------|
-| 📊 **Dashboard** | Status hotspot, clients, traffic monitor |
-| ⚙️ **Hotspot Settings** | Change channel, SSID, password |
-| 👥 **Client Monitor** | View connected devices, block/unblock |
-| 🔧 **Proxy Config** | Upload config, edit providers |
-| 📈 **Speedtest** | Test speed per channel |
+| Feature                 | Description                              |
+| ----------------------- | ---------------------------------------- |
+| 📊 **Dashboard**        | Status hotspot, clients, traffic monitor |
+| ⚙️ **Hotspot Settings** | Change channel, SSID, password           |
+| 👥 **Client Monitor**   | View connected devices, block/unblock    |
+| 🔧 **Proxy Config**     | Upload config, edit providers            |
+| 📈 **Speedtest**        | Test speed per channel                   |
 
 ---
 
@@ -152,6 +154,7 @@ tun:
 ```
 
 **Config Locations:**
+
 - Main: `config/config.yaml`
 - Game: `config/game.yaml`
 - Providers: `config/proxy-providers/`
@@ -235,18 +238,21 @@ mihomo-gateway/
 ## 🎯 Performance Tips
 
 **For Best Speed:**
+
 - ✅ Use channel 6 (most stable)
 - ✅ Disable WiFi power saving
 - ✅ Use USB 3.0 for tethering
 - ✅ Enable QoS/WMM
 
 **For Gaming:**
+
 - ✅ Use `game.yaml` config
 - ✅ Enable TUN mode
 - ✅ Use low latency proxy
 - ✅ Direct connection for game servers
 
 **For Phone:**
+
 - ✅ Disable MAC randomization
 - ✅ Forget & reconnect if unstable
 - ✅ Keep WiFi always on
@@ -286,6 +292,7 @@ Hotspot akan start otomatis setelah boot.
 ## 🤝 Contributing
 
 Contributions welcome! Please:
+
 1. Fork repository
 2. Create feature branch
 3. Commit changes
@@ -297,6 +304,7 @@ Contributions welcome! Please:
 ## 📞 Support
 
 **Issues?** Check:
+
 1. Run `sudo bash diagnose.sh`
 2. Check logs: `sudo journalctl -u hostapd -n 50`
 3. Verify power saving OFF
