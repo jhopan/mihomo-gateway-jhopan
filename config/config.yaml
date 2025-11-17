@@ -1,9 +1,9 @@
 # =========================
 # 🔧 PORTS & CORE SETTINGS
 # =========================
-port: 7890
-socks-port: 7891
-mixed-port: 7890
+port: 7891 # HTTP proxy port (changed to avoid conflict)
+socks-port: 7892 # SOCKS5 proxy port
+mixed-port: 7893 # Mixed port (HTTP + SOCKS5) - avoid port conflict
 redir-port: 9797
 tproxy-port: 9898
 mode: rule
@@ -158,6 +158,34 @@ proxy-providers:
       interval: 30
 
 # =========================
+# 📋 RULE PROVIDERS (Simple)
+# =========================
+rule-providers:
+  # Streaming services (Netflix, YouTube, etc.)
+  streaming_provider:
+    type: file
+    behavior: domain
+    path: /opt/mihomo-gateway/config/rule_providers/streaming.yaml
+
+  # Gaming services
+  gaming_provider:
+    type: file
+    behavior: domain
+    path: /opt/mihomo-gateway/config/rule_providers/gaming.yaml
+
+  # Social media
+  social_provider:
+    type: file
+    behavior: domain
+    path: /opt/mihomo-gateway/config/rule_providers/social.yaml
+
+  # Custom rules
+  custom_provider:
+    type: file
+    behavior: domain
+    path: /opt/mihomo-gateway/config/rule_providers/custom.yaml
+
+# =========================
 # 🎯 PROXY GROUPS
 # =========================
 proxy-groups:
@@ -251,6 +279,12 @@ rules:
   - DOMAIN-SUFFIX,pornhub.com,Situs X
   - DOMAIN-SUFFIX,phncdn.com,Situs X
   - DOMAIN-SUFFIX,phprcdn.com,Situs X
+
+  # 📋 Rule Providers (Custom rules dari file)
+  - RULE-SET,custom_provider,INTERNET-UMUM
+  - RULE-SET,streaming_provider,STREAMING×SOSMED
+  - RULE-SET,gaming_provider,GAME
+  - RULE-SET,social_provider,STREAMING×SOSMED
 
   # Default
   - MATCH,INTERNET-UMUM
