@@ -1,39 +1,20 @@
 # =========================
 # 🔧 PORTS & CORE SETTINGS
 # =========================
-# Mihomo (Clash Meta) Configuration
-# Gateway Mode with Multiple Methods Support
-
-port: 7890 # HTTP proxy port
-socks-port: 7891 # SOCKS5 proxy port
-mixed-port: 7890 # Mixed port (HTTP + SOCKS5)
-redir-port: 9797 # Redirect port (for REDIRECT method)
-tproxy-port: 9898 # TProxy port (for TPROXY method)
-
+port: 7890
+socks-port: 7891
+mixed-port: 7890
+redir-port: 9797
+tproxy-port: 9898
 mode: rule
 allow-lan: true
 bind-address: "*"
-
-# Log level: silent / error / warning / info / debug
-log-level: warning # Warning level untuk pantau error ringan
-
-# External Controller (API)
-external-controller: 0.0.0.0:9090
-# external-ui: /var/www/html/mihomo-ui/dashboard # Disabled - using custom Nginx WebUI
-secret: "mihomo-gateway-2024" # Ganti ini!
-
-# IPv6 support (disabled untuk stabilitas)
-ipv6: false
-
-# Performance settings
+log-level: warning
 unified-delay: true
+ipv6: false
+external-controller: 0.0.0.0:9090
 tcp-concurrent: true
-
-# Interface name (auto-detect by default)
-# interface-name: eth0
-
-# Routing mark
-routing-mark: 666
+secret: "mihomo-gateway-2024"
 
 # =========================
 # 🔖 PROFILE
@@ -42,12 +23,20 @@ profile:
   store-selected: true
   store-fake-ip: true
 
-# Geodata settings
-geodata-mode: true
-geox-url:
-  geoip: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
-  geosite: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
-  mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+# =========================
+# 🧩 TUN MODE
+# =========================
+tun:
+  enable: false
+  device: utun
+  mtu: 1500
+  stack: system
+  strict-route: false
+  dns-hijack:
+    - any:53
+    - tcp://any:53
+  auto-route: true
+  auto-detect-interface: true
 
 # =========================
 # 🌐 DNS SETTINGS
@@ -56,38 +45,32 @@ dns:
   enable: true
   prefer-h3: false
   listen: 0.0.0.0:1053
-  ipv6: false # Disabled untuk stabilitas
+  ipv6: false
   use-hosts: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
 
-  # Default nameserver (bootstrap DNS)
   default-nameserver:
-    - 223.5.5.5 # DNS lokal cepat (Alibaba)
+    - 223.5.5.5
     - 1.1.1.1
     - 8.8.8.8
 
-  # Main nameserver
   nameserver:
     - 223.5.5.5
     - 1.1.1.1
     - 8.8.8.8
 
-  # Fallback nameserver
   fallback:
     - 9.9.9.9
     - 1.0.0.1
     - 8.8.4.4
 
-  # Fake-IP filter (PENTING!)
   fake-ip-filter:
     # Sistem lokal (WAJIB)
     - "+.lan"
     - "+.local"
     - "+.localhost"
     - "+.localdomain"
-    - "192.168.1.1" # Gateway IP
-    - "mihomo-gateway.local"
 
     # NTP / sinkronisasi waktu (WAJIB)
     - "+.ntp.org"
@@ -102,7 +85,6 @@ dns:
 
     # STUN untuk VoIP/game (WAJIB)
     - "+.stun.*"
-    - "+.stun.playstation.net"
 
     # GitHub (WAJIB)
     - "+.github.com"
@@ -115,7 +97,6 @@ dns:
     # Docker registry (WAJIB)
     - "+.docker.com"
     - "+.docker.io"
-    - "+.docker.internal"
     - "+.registry-1.docker.io"
 
     # CDN provider penting (WAJIB real DNS)
@@ -125,31 +106,16 @@ dns:
     - "+.cloudfront.net"
     - "+.fastly.net"
 
-    # Streaming (WAJIB)
+    # Google streaming (WAJIB)
     - "+.googlevideo.com"
+
+    # Netflix streaming (WAJIB)
     - "+.nflxvideo.net"
     - "+.netflix.com"
-
-    # Gaming platforms
-    - "*.battlenet.com.cn"
-    - "*.battlenet.com"
-    - "*.blzstatic.cn"
-    - "*.battle.net"
-    - "+.srv.nintendo.net"
-    - "+.xboxlive.com"
-    - "xbox.*.microsoft.com"
-
-    # Services
-    - "+.msftconnecttest.com"
-    - "+.msftncsi.com"
-    - "msftconnecttest.com"
-    - "+.casaos.local"
-    - "localhost.ptlogin2.qq.com"
 
     # Fix bug Google Lens
     - "lens.l.google.com"
 
-  # Fallback filter
   fallback-filter:
     geoip: true
     geoip-code: ID
@@ -169,282 +135,122 @@ dns:
       - "+.youtube.com"
       - "+.githubusercontent.com"
       - "+.googlevideo.com"
+      - "+.*"
 
 # =========================
-# 🧩 TUN MODE
+# 🚀 PROXY PROVIDERS
 # =========================
-tun:
-  enable: false # Disabled by default (gunakan iptables REDIRECT)
-  device: utun
-  mtu: 1500 # Turunkan ke 1500 biar stabil di ISP Indonesia
-  stack: system
-  strict-route: false
-  dns-hijack:
-    - any:53
-    - tcp://any:53
-  auto-route: true
-  auto-detect-interface: true
-
-# === Proxy Providers ===
-# Menggunakan standard naming: proxy-providers
 proxy-providers:
-  # Provider 1 - Subscription URL
-  subscription_provider:
-    type: http
-    url: "https://example.com/your-subscription-url"
-    interval: 3600
-    path: /opt/mihomo-gateway/config/proxy_providers/subscription.yaml
+  VPN-1:
+    type: file
+    path: "/opt/mihomo-gateway/config/proxy_providers/vpn1.yaml"
     health-check:
       enable: true
-      interval: 300
-      lazy: false
       url: http://www.gstatic.com/generate_204
+      interval: 30
 
-  # Provider 2 - Custom proxies (manual)
-  custom_provider:
+  VPN-2:
     type: file
-    path: /opt/mihomo-gateway/config/proxy_providers/custom.yaml
+    path: "/opt/mihomo-gateway/config/proxy_providers/vpn2.yaml"
     health-check:
       enable: true
-      interval: 300
-      lazy: false
       url: http://www.gstatic.com/generate_204
+      interval: 30
 
-  # Provider 3 - Backup/fallback provider
-  backup_provider:
-    type: file
-    path: /opt/mihomo-gateway/config/proxy_providers/backup.yaml
-    health-check:
-      enable: true
-      interval: 300
-      lazy: false
-      url: http://www.gstatic.com/generate_204
-
-# === Rule Providers ===
-# Menggunakan standard naming: rule-providers
-rule-providers:
-  # Reject/Block rules (ads, trackers, malware)
-  reject_provider:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
-    path: /opt/mihomo-gateway/config/rule_providers/reject.yaml
-    interval: 86400
-
-  # Proxy rules (sites that need proxy)
-  proxy_provider:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
-    path: /opt/mihomo-gateway/config/rule_providers/proxy.yaml
-    interval: 86400
-
-  # Direct rules (local sites, no proxy needed)
-  direct_provider:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
-    path: /opt/mihomo-gateway/config/rule_providers/direct.yaml
-    interval: 86400
-
-  # GFW list (blocked sites in China)
-  gfw_provider:
-    type: http
-    behavior: domain
-    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
-    path: /opt/mihomo-gateway/config/rule_providers/gfw.yaml
-    interval: 86400
-
-  # Streaming services rules
-  streaming_provider:
-    type: file
-    behavior: domain
-    path: /opt/mihomo-gateway/config/rule_providers/streaming.yaml
-
-  # Gaming services rules
-  gaming_provider:
-    type: file
-    behavior: domain
-    path: /opt/mihomo-gateway/config/rule_providers/gaming.yaml
-
-  # Social media rules
-  social_provider:
-    type: file
-    behavior: domain
-    path: /opt/mihomo-gateway/config/rule_providers/social.yaml
-
-  # Custom rules (your own)
-  custom_provider:
-    type: file
-    behavior: domain
-    path: /opt/mihomo-gateway/config/rule_providers/custom.yaml
-
-# === Proxy Groups ===
+# =========================
+# 🎯 PROXY GROUPS
+# =========================
 proxy-groups:
-  # Main proxy selector
-  - name: "🚀 Proxy"
-    type: select
-    proxies:
-      - "♻️ Auto"
-      - "🔰 Fallback"
-      - "⚖️ LoadBalance"
-      - "🎯 Direct"
-    use:
-      - subscription_provider
-      - custom_provider
-      - backup_provider
-
-  # Auto select (fastest by latency)
-  - name: "♻️ Auto"
-    type: url-test
-    use:
-      - subscription_provider
-      - custom_provider
-      - backup_provider
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    tolerance: 50
-    lazy: false
-
-  # Fallback (auto switch on failure)
-  - name: "🔰 Fallback"
+  - name: INTERNET-UMUM
     type: fallback
+    disable-udp: false
     use:
-      - subscription_provider
-      - custom_provider
-      - backup_provider
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    lazy: false
+      - VPN-1
+      - VPN-2
+    url: http://www.gstatic.com/generate_204
+    interval: 60
 
-  # Load Balance (distribute traffic)
-  - name: "⚖️ LoadBalance"
-    type: load-balance
-    strategy: consistent-hashing
+  - name: STREAMING×SOSMED
+    type: select
+    disable-udp: false
     use:
-      - subscription_provider
-      - custom_provider
-      - backup_provider
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    lazy: false
+      - VPN-2
+      - VPN-1
 
-  # Streaming services (Netflix, YouTube, etc.)
-  - name: "🎬 Streaming"
+  - name: Situs X
     type: select
-    proxies:
-      - "🚀 Proxy"
-      - "♻️ Auto"
-      - "🔰 Fallback"
-      - "🎯 Direct"
+    disable-udp: false
     use:
-      - subscription_provider
-      - custom_provider
+      - VPN-2
 
-  # Social Media (Facebook, Instagram, Twitter, etc.)
-  - name: "📱 Social"
-    type: select
-    proxies:
-      - "🚀 Proxy"
-      - "♻️ Auto"
-      - "🔰 Fallback"
-      - "🎯 Direct"
+  - name: GAME
+    type: url-test
+    disable-udp: false
     use:
-      - subscription_provider
-      - custom_provider
-
-  # Gaming (Steam, Epic, etc.)
-  - name: "🎮 Gaming"
-    type: select
-    proxies:
-      - "🎯 Direct"
-      - "🚀 Proxy"
-      - "♻️ Auto"
-    use:
-      - subscription_provider
-      - custom_provider
-
-  # Direct connection (no proxy)
-  - name: "🎯 Direct"
-    type: select
-    proxies:
-      - DIRECT
-
-  # Reject/Block (ads, trackers)
-  - name: "🛑 Reject"
-    type: select
-    proxies:
-      - REJECT
-      - DIRECT
-
-  # Final rule (when no rule matches)
-  - name: "🐟 Final"
-    type: select
-    proxies:
-      - "🚀 Proxy"
-      - "♻️ Auto"
-      - "🔰 Fallback"
-      - "🎯 Direct"
-    use:
-      - subscription_provider
-      - custom_provider
-      - backup_provider
+      - VPN-1
+    url: http://www.gstatic.com/generate_204
+    interval: 30
 
 # =========================
 # ⚙️ RULES
 # =========================
-# Semua rules sudah dipindah ke rule-providers
-# Edit rules di folder: /opt/mihomo-gateway/config/rule_providers/
-
 rules:
-  # Proteksi fake-ip (WAJIB)
+  # Proteksi fake-ip
   - IP-CIDR,198.18.0.1/16,REJECT,no-resolve
 
-  # Blokir DoH bypass (opsional, uncomment jika perlu)
-  # - DOMAIN-SUFFIX,dns.google,REJECT
-  # - DOMAIN-SUFFIX,cloudflare-dns.com,REJECT
+  # Blokir DoH bypass
+  - DOMAIN-SUFFIX,dns.google,REJECT
+  - DOMAIN-SUFFIX,cloudflare-dns.com,REJECT
 
-  # LAN & Private network (always direct)
-  - IP-CIDR,192.168.1.0/24,🎯 Direct,no-resolve # Hotspot network
-  - IP-CIDR,10.0.0.0/8,🎯 Direct,no-resolve # Private network
-  - IP-CIDR,172.16.0.0/12,🎯 Direct,no-resolve # Private + Docker
-  - IP-CIDR,192.168.0.0/16,🎯 Direct,no-resolve # Private network
-  - IP-CIDR,127.0.0.0/8,🎯 Direct,no-resolve # Localhost
-  - IP-CIDR,224.0.0.0/4,🎯 Direct,no-resolve # Multicast
-  - IP-CIDR,240.0.0.0/4,🎯 Direct,no-resolve # Reserved
+  # Bypass push notif Google (biar gak ganggu ping)
+  - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
+  - DOMAIN-SUFFIX,mtalk4.google.com,DIRECT
+  - DST-PORT,5228,DIRECT
 
-  # Mihomo Web UI (direct)
-  - DST-PORT,9090,🎯 Direct # Mihomo API
+  # 🎮 Game Ports (MLBB / Magic Chess / FF / Funny Fighter)
+  - DST-PORT,5000-5221,GAME,udp,no-resolve
+  - DST-PORT,5224-5287,GAME,udp,no-resolve
+  - DST-PORT,5289-5700,GAME,udp,no-resolve
+  - DST-PORT,8443,GAME,udp,no-resolve
+  - DST-PORT,9000-9010,GAME,udp,no-resolve
+  - DST-PORT,10000-10100,GAME,udp,no-resolve
+  - DST-PORT,5055-5058,GAME,udp,no-resolve
+  - DST-PORT,6006-6012,GAME,udp,no-resolve
 
-  # Google Push Notification (bypass untuk notif lancar)
-  - DOMAIN-SUFFIX,mtalk.google.com,🎯 Direct
-  - DOMAIN-SUFFIX,mtalk4.google.com,🎯 Direct
-  - DST-PORT,5228,🎯 Direct
+  # IP server MLBB / FF / Funny Fighter
+  - IP-CIDR,103.10.124.0/23,GAME,no-resolve
+  - IP-CIDR,103.10.125.0/24,GAME,no-resolve
+  - IP-CIDR,13.213.0.0/16,GAME,no-resolve
+  - IP-CIDR,45.64.0.0/16,GAME,no-resolve
+  - IP-CIDR,52.74.0.0/16,GAME,no-resolve
+  - IP-CIDR,119.81.0.0/16,GAME,no-resolve
+  - IP-CIDR,161.117.0.0/16,GAME,no-resolve
+  - IP-CIDR,43.249.0.0/16,GAME,no-resolve
+  - IP-CIDR,103.11.128.0/22,GAME,no-resolve
+  - IP-CIDR,203.205.0.0/16,GAME,no-resolve
+  - IP-CIDR,182.254.0.0/16,GAME,no-resolve
 
-  # === Rule Providers (Edit rules di folder rule_providers) ===
+  # 🌐 Streaming & Sosmed
+  - DOMAIN-SUFFIX,youtube.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,googlevideo.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,ytimg.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,instagram.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,cdninstagram.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,tiktok.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,tiktokcdn.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,tiktokv.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,telegram.org,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,telegra.ph,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,facebook.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,fbcdn.net,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,spotify.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,netflix.com,STREAMING×SOSMED
+  - DOMAIN-SUFFIX,nflxvideo.net,STREAMING×SOSMED
 
-  # Custom rules (prioritas tertinggi)
-  - RULE-SET,custom_provider,🚀 Proxy
+  # 🔞 Situs X
+  - DOMAIN-SUFFIX,pornhub.com,Situs X
+  - DOMAIN-SUFFIX,phncdn.com,Situs X
+  - DOMAIN-SUFFIX,phprcdn.com,Situs X
 
-  # Block ads & trackers
-  - RULE-SET,reject_provider,🛑 Reject
-
-  # Streaming services
-  - RULE-SET,streaming_provider,🎬 Streaming
-
-  # Social media
-  - RULE-SET,social_provider,📱 Social
-
-  # Gaming platforms
-  - RULE-SET,gaming_provider,🎮 Gaming
-
-  # Sites that need proxy
-  - RULE-SET,proxy_provider,🚀 Proxy
-  - RULE-SET,gfw_provider,🚀 Proxy
-
-  # Direct connections (Indonesia)
-  - GEOIP,ID,🎯 Direct
-  - RULE-SET,direct_provider,🎯 Direct
-
-  # Final rule (default)
-  - MATCH,🐟 Final
+  # Default
+  - MATCH,INTERNET-UMUM
