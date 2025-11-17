@@ -193,7 +193,7 @@ proxy-providers:
     type: http
     url: "https://example.com/your-subscription-url"
     interval: 3600
-    path: /etc/mihomo/proxy_providers/subscription.yaml
+    path: /opt/mihomo-gateway/config/proxy_providers/subscription.yaml
     health-check:
       enable: true
       interval: 300
@@ -203,7 +203,7 @@ proxy-providers:
   # Provider 2 - Custom proxies (manual)
   custom_provider:
     type: file
-    path: /etc/mihomo/proxy_providers/custom.yaml
+    path: /opt/mihomo-gateway/config/proxy_providers/custom.yaml
     health-check:
       enable: true
       interval: 300
@@ -213,7 +213,7 @@ proxy-providers:
   # Provider 3 - Backup/fallback provider
   backup_provider:
     type: file
-    path: /etc/mihomo/proxy_providers/backup.yaml
+    path: /opt/mihomo-gateway/config/proxy_providers/backup.yaml
     health-check:
       enable: true
       interval: 300
@@ -228,7 +228,7 @@ rule-providers:
     type: http
     behavior: domain
     url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
-    path: /etc/mihomo/rule_providers/reject.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/reject.yaml
     interval: 86400
 
   # Proxy rules (sites that need proxy)
@@ -236,7 +236,7 @@ rule-providers:
     type: http
     behavior: domain
     url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
-    path: /etc/mihomo/rule_providers/proxy.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/proxy.yaml
     interval: 86400
 
   # Direct rules (local sites, no proxy needed)
@@ -244,7 +244,7 @@ rule-providers:
     type: http
     behavior: domain
     url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
-    path: /etc/mihomo/rule_providers/direct.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/direct.yaml
     interval: 86400
 
   # GFW list (blocked sites in China)
@@ -252,32 +252,32 @@ rule-providers:
     type: http
     behavior: domain
     url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
-    path: /etc/mihomo/rule_providers/gfw.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/gfw.yaml
     interval: 86400
 
   # Streaming services rules
   streaming_provider:
     type: file
     behavior: domain
-    path: /etc/mihomo/rule_providers/streaming.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/streaming.yaml
 
   # Gaming services rules
   gaming_provider:
     type: file
     behavior: domain
-    path: /etc/mihomo/rule_providers/gaming.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/gaming.yaml
 
   # Social media rules
   social_provider:
     type: file
     behavior: domain
-    path: /etc/mihomo/rule_providers/social.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/social.yaml
 
   # Custom rules (your own)
   custom_provider:
     type: file
     behavior: domain
-    path: /etc/mihomo/rule_providers/custom.yaml
+    path: /opt/mihomo-gateway/config/rule_providers/custom.yaml
 
 # === Proxy Groups ===
 proxy-groups:
@@ -394,7 +394,7 @@ proxy-groups:
 # ⚙️ RULES
 # =========================
 # Semua rules sudah dipindah ke rule-providers
-# Edit rules di folder: /etc/mihomo/rule_providers/
+# Edit rules di folder: /opt/mihomo-gateway/config/rule_providers/
 
 rules:
   # Proteksi fake-ip (WAJIB)
