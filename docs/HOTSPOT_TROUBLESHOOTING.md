@@ -5,11 +5,13 @@
 ### Issue 1: Client Disconnects After Few Minutes
 
 **Symptoms:**
+
 - Phone/device connects successfully
 - After 2-5 minutes, connection drops
 - Cannot reconnect without restarting hotspot
 
 **Causes:**
+
 - WiFi power management enabled
 - Driver putting interface to sleep
 - Weak signal or interference
@@ -48,11 +50,13 @@ sudo journalctl -u hotspot-stability-monitor -f
 ### Issue 2: Cannot Connect to Hotspot
 
 **Symptoms:**
+
 - SSID visible but authentication fails
 - "Obtaining IP address..." stuck forever
 - Wrong password error (but password is correct)
 
 **Causes:**
+
 - hostapd not running properly
 - Channel interference
 - DHCP server issue
@@ -93,6 +97,7 @@ sudo systemctl restart dnsmasq
 ### Issue 3: Hotspot Stops After System Sleep/Suspend
 
 **Symptoms:**
+
 - Hotspot works fine initially
 - After laptop sleep/suspend, hotspot stops
 - Need to manually restart
@@ -140,11 +145,13 @@ sudo systemctl restart systemd-logind
 ### Issue 4: Slow Speed or High Latency
 
 **Symptoms:**
+
 - Connection works but very slow
 - High ping times (>100ms)
 - Downloads timeout
 
 **Causes:**
+
 - Channel interference
 - Weak signal
 - NAT/routing issue
@@ -191,6 +198,7 @@ sudo bash scripts/hotspot.sh restart
 ### Issue 5: Interface Name Changes (USB Tethering)
 
 **Symptoms:**
+
 - After USB replug: `enx365a03849d07` becomes `enx...something else`
 - Hotspot stops working
 - Need to reconfigure
@@ -225,6 +233,7 @@ sudo udevadm trigger
 ## 🔧 Diagnostic Commands
 
 ### Full System Check
+
 ```bash
 # Run all checks at once
 echo "=== Interface Status ==="
@@ -261,6 +270,7 @@ sudo journalctl -u dnsmasq -n 20
 ```
 
 ### Live Monitoring
+
 ```bash
 # Watch logs in real-time
 sudo journalctl -u hostapd -u dnsmasq -f
@@ -324,6 +334,7 @@ sudo tcpdump -i wlp2s0 -c 100
 ## 🆘 Emergency Recovery
 
 ### Complete Reset
+
 ```bash
 # 1. Stop everything
 sudo systemctl stop hotspot-stability-monitor
@@ -352,6 +363,7 @@ sudo systemctl start hotspot-stability-monitor
 ```
 
 ### Factory Reset (Nuclear Option)
+
 ```bash
 # WARNING: This removes ALL mihomo gateway configs!
 cd /opt/mihomo-gateway
@@ -369,6 +381,7 @@ sudo bash scripts/hotspot.sh start
 ## 📝 Config Optimization Tips
 
 ### For Gaming (Low Latency)
+
 ```bash
 # Edit hostapd.conf
 sudo nano /etc/hostapd/hostapd.conf
@@ -382,6 +395,7 @@ ap_max_inactivity=600      # Longer timeout (10 minutes)
 ```
 
 ### For Stability (Many Clients)
+
 ```bash
 # Edit hostapd.conf
 sudo nano /etc/hostapd/hostapd.conf
@@ -396,6 +410,7 @@ rts_threshold=2347         # Enable RTS/CTS for reliability
 ```
 
 ### For Power Saving (Battery)
+
 ```bash
 # Not recommended for hotspot!
 # But if you need it:
