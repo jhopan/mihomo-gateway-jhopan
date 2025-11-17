@@ -1,12 +1,7 @@
 # Mihomo Gateway .gitignore
 
-# Config files with sensitive data
-config/config.yaml
-config/proxies/*.yaml
-!config/proxies/custom.yaml
-config/rules/*.yaml
-!config/rules/custom.yaml
-!config/rules/streaming.yaml
+# Config files with sensitive data (only exclude user subscriptions)
+config/proxy_providers/subscription.yaml
 
 # Logs
 *.log
