@@ -2,8 +2,14 @@
 
 echo "🔧 Fixing NAT routing for current USB interface..."
 
-# Detect current USB interface (enx* or usb*)
-USB_IFACE=$(ip -o link show | grep -E "enx[a-f0-9]+|usb[0-9]+" | awk -F': ' '{print $2}' | grep "state UP" -B1 | head -1 | awk '{print $1}')
+# Detect current USB interface (enx* or usb* - typically USB tethering)
+# Priority: enx* > usb* > any non-standard interface
+USB_IFACE=$(ip -o link show | awk -F': ' '$2 ~ /^enx/ {print $2; exit}')
+
+if [ -z "$USB_IFACE" ]; then
+    # Try usb* pattern
+    USB_IFACE=$(ip -o link show | awk -F': ' '$2 ~ /^usb/ {print $2; exit}')
+fi
 
 if [ -z "$USB_IFACE" ]; then
     echo "❌ No USB interface found!"
