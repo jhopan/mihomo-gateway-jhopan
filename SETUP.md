@@ -45,16 +45,16 @@ sudo tee /etc/nginx/sites-available/default > /dev/null << 'EOF'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    
+
     root /var/www/html;
     index index.php index.html;
-    
+
     server_name _;
-    
+
     location / {
         try_files $uri $uri/ =404;
     }
-    
+
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
         fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
@@ -72,46 +72,54 @@ echo "✅ WebUI ready at: http://192.168.1.1"
 ### 4️⃣ Akses Web UI
 
 **Dari laptop WiFi yang connect ke hotspot:**
+
 ```
 http://192.168.1.1
 ```
 
 **Dari server lokal:**
+
 ```
 http://localhost
 ```
 
 **Login default:**
+
 - Username: `admin`
 - Password: `mihomo2024`
 
 ## 📋 Fitur Web UI
 
 ✅ **Dashboard**
+
 - Status hotspot (on/off)
 - Jumlah client connected
 - Traffic monitor real-time
 - CPU & Memory usage
 
 ✅ **Hotspot Control**
+
 - Start/Stop/Restart hotspot
 - Change WiFi channel (1, 6, 11)
 - Change SSID & Password
 - Enable/Disable TUN mode
 
 ✅ **Client Monitor**
+
 - Daftar device connected
 - IP address & MAC address
 - Download/Upload speed per client
 - Block/Unblock client
 
 ✅ **Proxy Config**
+
 - Upload config.yaml
 - Edit proxy providers
 - Edit rule providers
 - Switch between game/browsing config
 
 ✅ **Speedtest**
+
 - Test kecepatan hotspot
 - Compare antar channel
 - Historical data
@@ -124,6 +132,7 @@ http://localhost
 Dashboard → Hotspot Settings → Channel → Pilih 1/6/11 → Apply
 
 **Via Command:**
+
 ```bash
 # Edit config
 sudo nano /etc/hostapd/hostapd.conf
@@ -141,6 +150,7 @@ sudo bash /opt/mihomo-gateway/scripts/hotspot.sh restart
 Dashboard → Hotspot Settings → SSID/Password → Apply
 
 **Via Command:**
+
 ```bash
 sudo nano /etc/hostapd/hostapd.conf
 
@@ -157,6 +167,7 @@ sudo bash /opt/mihomo-gateway/scripts/hotspot.sh restart
 Dashboard → Proxy Config → Upload → Pilih file config.yaml
 
 **Via Command:**
+
 ```bash
 # Edit config
 sudo nano /opt/mihomo-gateway/config/config.yaml
@@ -168,22 +179,26 @@ sudo systemctl restart mihomo
 ## 🛠️ Tools Berguna
 
 ### Test Channel Speed
+
 ```bash
 # Interactive manual test
 sudo bash test-speed-manual.sh
 ```
 
 ### Check WiFi Capabilities
+
 ```bash
 sudo bash check-wifi-capabilities.sh
 ```
 
 ### Diagnose Problems
+
 ```bash
 sudo bash diagnose.sh
 ```
 
 ### Monitor Clients
+
 ```bash
 # Real-time monitoring
 sudo bash scripts/client-monitor.sh
@@ -214,6 +229,7 @@ sudo hostapd_cli all_sta
 ## 🔥 Troubleshooting
 
 ### Hotspot tidak start
+
 ```bash
 # Check interfaces
 sudo bash scripts/detect-interfaces.sh
@@ -228,6 +244,7 @@ sudo bash scripts/hotspot.sh restart
 ```
 
 ### Client tidak bisa connect
+
 ```bash
 # Check power saving (MUST BE OFF!)
 sudo /usr/sbin/iw dev wlp2s0 get power_save
@@ -240,6 +257,7 @@ sudo journalctl -u hostapd -n 50
 ```
 
 ### Tidak ada internet
+
 ```bash
 # Check USB tethering
 ip link show | grep enx
@@ -282,6 +300,7 @@ sudo systemctl enable dnsmasq
 ## 📱 Recommended Phone Settings
 
 **Untuk koneksi stabil:**
+
 1. Settings → WiFi → Advanced
 2. **DISABLE** "Random MAC address"
 3. **DISABLE** "Auto-reconnect"
@@ -290,6 +309,7 @@ sudo systemctl enable dnsmasq
 ## ⚡ Performance Tips
 
 **Untuk speed maksimal:**
+
 - ✅ Channel 6 (paling stabil)
 - ✅ HT40 enabled (40 MHz width)
 - ✅ Power saving OFF (critical!)
@@ -297,6 +317,7 @@ sudo systemctl enable dnsmasq
 - ✅ USB 3.0 tethering (biru port)
 
 **Untuk game:**
+
 - ✅ Pakai game.yaml config
 - ✅ TUN mode enabled
 - ✅ Low latency proxy

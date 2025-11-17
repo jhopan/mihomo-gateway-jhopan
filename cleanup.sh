@@ -1,41 +1,81 @@
 #!/bin/bash
 
-echo "Cleaning up debugging scripts..."
+echo "Cleaning up unnecessary files..."
 echo ""
 
-# List of debugging scripts to remove
-DEBUG_SCRIPTS=(
-    "apply-stable-config.sh"
-    "auto-test-channels.sh"
-    "final-working-solution.sh"
-    "fix-ath10k.sh"
-    "fix-auth-timeout.sh"
-    "fix-conflict.sh"
-    "fix-hostapd-final.sh"
-    "fix-hostapd-stable.sh"
-    "fix-hotspot-emergency.sh"
-    "fix-mac-randomization.sh"
-    "fix-old-laptop-wifi.sh"
-    "fix-open-network.sh"
-    "try-minimal-wpa.sh"
-    "ultimate-fix.sh"
-    "use-working-config.sh"
-    "test-all-channels.sh"
-    "test-channels-with-speed.sh"
+# Root directory cleanup
+ROOT_CLEANUP=(
+    "check-wifi-capabilities.sh"
+    "test-speed-manual.sh"
+    "CHANGELOG.md"
+    "CHANGELOG_V2.1.md"
+    "COMMANDS.md"
+    "COMPARISON.md"
+    "INSTALL_GUIDE.md"
+    "PROJECT_SUMMARY.md"
+    "QUICK_START.md"
+    "STRUCTURE.md"
+    "TODO.md"
+    "ULTRA_QUICK.md"
+    "UPGRADE_V2.1.md"
+)
+
+# Scripts directory cleanup
+SCRIPT_CLEANUP=(
+    "scripts/smart-channel.sh"
+    "scripts/smart-setup.sh"
+    "scripts/routing-enhanced.sh"
+    "scripts/hotspot-stability-monitor.sh"
+    "scripts/hotspot-stability-monitor.service"
 )
 
 REMOVED=0
-for script in "${DEBUG_SCRIPTS[@]}"; do
-    if [ -f "$script" ]; then
-        rm -f "$script"
-        echo "✅ Removed: $script"
+
+echo "Removing root files..."
+for file in "${ROOT_CLEANUP[@]}"; do
+    if [ -f "$file" ]; then
+        rm -f "$file"
+        echo "  ✅ Removed: $file"
         ((REMOVED++))
     fi
 done
 
 echo ""
-echo "Cleanup complete! Removed $REMOVED debug scripts."
+echo "Removing unused scripts..."
+for file in "${SCRIPT_CLEANUP[@]}"; do
+    if [ -f "$file" ]; then
+        rm -f "$file"
+        echo "  ✅ Removed: $file"
+        ((REMOVED++))
+    fi
+done
+
 echo ""
-echo "Keeping only essential scripts:"
-ls -lh *.sh 2>/dev/null | awk '{print "  ✅", $9}'
+echo "================================================"
+echo "Cleanup complete! Removed $REMOVED files."
+echo "================================================"
+echo ""
+echo "📁 Essential files kept:"
+echo ""
+echo "Root:"
+echo "  ✅ README.md          - Main documentation"
+echo "  ✅ SETUP.md           - Complete setup guide"
+echo "  ✅ LICENSE            - Project license"
+echo "  ✅ install.sh         - Installation script"
+echo "  ✅ diagnose.sh        - Troubleshooting tool"
+echo ""
+echo "Scripts:"
+echo "  ✅ hotspot.sh         - Hotspot control (start/stop/restart)"
+echo "  ✅ detect-interfaces.sh - Network detection"
+echo "  ✅ client-monitor.sh  - Monitor connected clients"
+echo "  ✅ monitor.sh         - System monitoring"
+echo "  ✅ routing.sh         - NAT & routing setup"
+echo "  ✅ setup.sh           - Initial setup"
+echo "  ✅ speedtest-api.sh   - Speed test API"
+echo "  ✅ hotspot-watchdog.* - Auto-restart on failure"
+echo "  ✅ mihomo.service     - Mihomo systemd service"
+echo ""
+echo "Config:"
+echo "  ✅ config/            - Mihomo configurations"
+echo "  ✅ webui/             - Web control panel"
 echo ""
