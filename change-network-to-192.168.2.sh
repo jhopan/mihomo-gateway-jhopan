@@ -24,17 +24,47 @@ fi
 
 # Backup configs
 echo "[1/8] Backing up configurations..."
-sudo cp /opt/mihomo-gateway/config/hotspot.conf /opt/mihomo-gateway/config/hotspot.conf.backup
-sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.backup
-sudo cp /opt/mihomo-gateway/scripts/hotspot.sh /opt/mihomo-gateway/scripts/hotspot.sh.backup
+sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.backup 2>/dev/null || true
+sudo cp /opt/mihomo-gateway/scripts/hotspot.sh /opt/mihomo-gateway/scripts/hotspot.sh.backup 2>/dev/null || true
+sudo cp /opt/mihomo-gateway/scripts/usb-watchdog.sh /opt/mihomo-gateway/scripts/usb-watchdog.sh.backup 2>/dev/null || true
+sudo cp /opt/mihomo-gateway/fix-nat-now.sh /opt/mihomo-gateway/fix-nat-now.sh.backup 2>/dev/null || true
+echo "  Configs backed up"
 
 # Stop services
 echo "[2/8] Stopping services..."
 sudo systemctl stop hostapd dnsmasq
 
-# Update hotspot.conf
-echo "[3/8] Updating hotspot config..."
-sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/config/hotspot.conf
+# Update all scripts with 192.168.1 references
+echo "[3/8] Updating all config files..."
+# Update hotspot.sh
+if [ -f /opt/mihomo-gateway/scripts/hotspot.sh ]; then
+    sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/scripts/hotspot.sh
+    echo "  - hotspot.sh updated"
+fi
+
+# Update usb-watchdog.sh
+if [ -f /opt/mihomo-gateway/scripts/usb-watchdog.sh ]; then
+    sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/scripts/usb-watchdog.sh
+    echo "  - usb-watchdog.sh updated"
+fi
+
+# Update fix-nat-now.sh
+if [ -f /opt/mihomo-gateway/fix-nat-now.sh ]; then
+    sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/fix-nat-now.sh
+    echo "  - fix-nat-now.sh updated"
+fi
+
+# Update emergency-fix-network.sh
+if [ -f /opt/mihomo-gateway/emergency-fix-network.sh ]; then
+    sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/emergency-fix-network.sh
+    echo "  - emergency-fix-network.sh updated"
+fi
+
+# Update quick-fix-hotspot.sh
+if [ -f /opt/mihomo-gateway/quick-fix-hotspot.sh ]; then
+    sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/quick-fix-hotspot.sh
+    echo "  - quick-fix-hotspot.sh updated"
+fi
 
 # Update dnsmasq.conf
 echo "[4/8] Updating dnsmasq config..."
@@ -49,9 +79,11 @@ dhcp-option=3,192.168.2.1
 dhcp-option=6,8.8.8.8
 EOF
 
-# Update hotspot.sh script
-echo "[5/8] Updating hotspot.sh script..."
-sudo sed -i 's/192\.168\.1\./192.168.2./g' /opt/mihomo-gateway/scripts/hotspot.sh
+# Commit changes to git
+echo "[5/8] Committing changes to repository..."
+cd /opt/mihomo-gateway
+git add scripts/hotspot.sh scripts/usb-watchdog.sh fix-nat-now.sh emergency-fix-network.sh quick-fix-hotspot.sh 2>/dev/null || true
+git commit -m "Update network configuration: 192.168.1.x → 192.168.2.x" 2>/dev/null || echo "  - No changes to commit"
 
 # Configure WiFi interface with new IP
 echo "[6/8] Configuring WiFi interface..."
