@@ -196,17 +196,44 @@ country_code=ID
 ieee80211n=1
 ieee80211d=1
 
-# Stability improvements
+# Stability improvements - NEVER disconnect clients
 beacon_int=100
 dtim_period=2
 max_num_sta=10
 
-# Timeouts (prevent premature disconnects)
-ap_max_inactivity=300
+# Timeouts - DISABLED (0 = never timeout)
+ap_max_inactivity=0
+disassoc_low_ack=0
+skip_inactivity_poll=1
 
 # Control interface for monitoring
 ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
+
+# Disable client power saving detection
+wmm_ac_bk_cwmin=4
+wmm_ac_bk_cwmax=10
+wmm_ac_bk_aifs=7
+wmm_ac_bk_txop_limit=0
+wmm_ac_bk_acm=0
+wmm_ac_be_aifs=3
+wmm_ac_be_cwmin=4
+wmm_ac_be_cwmax=10
+wmm_ac_be_txop_limit=0
+wmm_ac_be_acm=0
+wmm_ac_vi_aifs=2
+wmm_ac_vi_cwmin=3
+wmm_ac_vi_cwmax=4
+wmm_ac_vi_txop_limit=94
+wmm_ac_vi_acm=0
+wmm_ac_vo_aifs=2
+wmm_ac_vo_cwmin=2
+wmm_ac_vo_cwmax=3
+wmm_ac_vo_txop_limit=47
+wmm_ac_vo_acm=0
+
+# AP isolation OFF (allow client-to-client)
+ap_isolate=0
 EOF
 
     # Add HT capabilities only if supported
@@ -241,6 +268,10 @@ rsn_pairwise=CCMP
 country_code=ID
 ctrl_interface=/var/run/hostapd
 ctrl_interface_group=0
+ap_max_inactivity=0
+disassoc_low_ack=0
+skip_inactivity_poll=1
+ap_isolate=0
 EOF
     fi
     
