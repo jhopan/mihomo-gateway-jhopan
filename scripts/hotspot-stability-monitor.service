@@ -1,0 +1,15 @@
+[Unit]
+Description=Hotspot Stability Monitor
+After=network.target hostapd.service dnsmasq.service
+Wants=hostapd.service dnsmasq.service
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /opt/mihomo-gateway/scripts/hotspot-stability-monitor.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -4,22 +4,22 @@
 # Mihomo Gateway Configuration - Optimized for Gaming & Streaming
 # Linux version (adapted from Android Magisk Box)
 
-port: 7890              # HTTP proxy port
-socks-port: 7891        # SOCKS5 proxy port
-mixed-port: 7890        # Mixed port (HTTP + SOCKS5)
-redir-port: 9797        # Redirect port (for REDIRECT method)
+port: 7890 # HTTP proxy port
+socks-port: 7891 # SOCKS5 proxy port
+mixed-port: 7890 # Mixed port (HTTP + SOCKS5)
+redir-port: 9797 # Redirect port (for REDIRECT method)
 
 mode: rule
 allow-lan: true
 bind-address: "*"
 
 # Log level: silent / error / warning / info / debug
-log-level: warning      # Warning level untuk pantau error ringan
+log-level: warning # Warning level untuk pantau error ringan
 
 # External Controller (API)
 external-controller: 0.0.0.0:9090
 external-ui: /var/www/html/mihomo-ui/dashboard
-secret: "mihomo-gateway-2024"  # Ganti ini!
+secret: "mihomo-gateway-2024" # Ganti ini!
 
 # IPv6 support (disabled untuk stabilitas)
 ipv6: false
@@ -52,14 +52,14 @@ dns:
   enable: true
   prefer-h3: false
   listen: 0.0.0.0:1053
-  ipv6: false               # Disabled untuk stabilitas
+  ipv6: false # Disabled untuk stabilitas
   use-hosts: true
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
 
   # Default nameserver (bootstrap DNS)
   default-nameserver:
-    - 223.5.5.5             # DNS lokal cepat (Alibaba)
+    - 223.5.5.5 # DNS lokal cepat (Alibaba)
     - 1.1.1.1
     - 8.8.8.8
 
@@ -82,7 +82,7 @@ dns:
     - "+.local"
     - "+.localhost"
     - "+.localdomain"
-    - "192.168.1.1"         # Gateway IP
+    - "192.168.1.1" # Gateway IP
     - "mihomo-gateway.local"
 
     # NTP / sinkronisasi waktu (WAJIB)
@@ -170,9 +170,9 @@ dns:
 # 🧩 TUN MODE
 # =========================
 tun:
-  enable: true              # Enabled sesuai request user
+  enable: true # Enabled sesuai request user
   device: utun
-  mtu: 1500                 # Turunkan ke 1500 biar stabil di ISP Indonesia
+  mtu: 1500 # Turunkan ke 1500 biar stabil di ISP Indonesia
   stack: system
   strict-route: false
   dns-hijack:
@@ -252,16 +252,16 @@ rules:
   - DOMAIN-SUFFIX,cloudflare-dns.com,REJECT
 
   # LAN & Private network (always direct)
-  - IP-CIDR,192.168.1.0/24,DIRECT,no-resolve        # Hotspot network
-  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve            # Private network
-  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve         # Private + Docker
-  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve        # Private network
-  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve           # Localhost
-  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve           # Multicast
-  - IP-CIDR,240.0.0.0/4,DIRECT,no-resolve           # Reserved
+  - IP-CIDR,192.168.1.0/24,DIRECT,no-resolve # Hotspot network
+  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve # Private network
+  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve # Private + Docker
+  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve # Private network
+  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve # Localhost
+  - IP-CIDR,224.0.0.0/4,DIRECT,no-resolve # Multicast
+  - IP-CIDR,240.0.0.0/4,DIRECT,no-resolve # Reserved
 
   # Mihomo Web UI (direct)
-  - DST-PORT,9090,DIRECT                            # Mihomo API
+  - DST-PORT,9090,DIRECT # Mihomo API
 
   # Bypass push notif Google (biar gak ganggu ping)
   - DOMAIN-SUFFIX,mtalk.google.com,DIRECT
@@ -269,59 +269,59 @@ rules:
   - DST-PORT,5228,DIRECT
 
   # === GAME RULES (MLBB / Magic Chess / FF / Funny Fighter) ===
-  
+
   # Game Ports UDP
-  - DST-PORT,5000-5221,GAME,udp,no-resolve          # MLBB range 1
-  - DST-PORT,5224-5287,GAME,udp,no-resolve          # MLBB range 2
-  - DST-PORT,5289-5700,GAME,udp,no-resolve          # MLBB range 3
-  - DST-PORT,8443,GAME,udp,no-resolve               # MLBB HTTPS
-  - DST-PORT,9000-9010,GAME,udp,no-resolve          # Game server
-  - DST-PORT,10000-10100,GAME,udp,no-resolve        # Game server range
-  - DST-PORT,5055-5058,GAME,udp,no-resolve          # FF range
-  - DST-PORT,6006-6012,GAME,udp,no-resolve          # FF range 2
+  - DST-PORT,5000-5221,GAME,udp,no-resolve # MLBB range 1
+  - DST-PORT,5224-5287,GAME,udp,no-resolve # MLBB range 2
+  - DST-PORT,5289-5700,GAME,udp,no-resolve # MLBB range 3
+  - DST-PORT,8443,GAME,udp,no-resolve # MLBB HTTPS
+  - DST-PORT,9000-9010,GAME,udp,no-resolve # Game server
+  - DST-PORT,10000-10100,GAME,udp,no-resolve # Game server range
+  - DST-PORT,5055-5058,GAME,udp,no-resolve # FF range
+  - DST-PORT,6006-6012,GAME,udp,no-resolve # FF range 2
 
   # Game Server IPs (MLBB / FF / Funny Fighter)
-  - IP-CIDR,103.10.124.0/23,GAME,no-resolve         # Moonton Indonesia
-  - IP-CIDR,103.10.125.0/24,GAME,no-resolve         # Moonton Indonesia
-  - IP-CIDR,13.213.0.0/16,GAME,no-resolve           # AWS Singapore (MLBB)
-  - IP-CIDR,45.64.0.0/16,GAME,no-resolve            # Game servers SEA
-  - IP-CIDR,52.74.0.0/16,GAME,no-resolve            # AWS Singapore
-  - IP-CIDR,119.81.0.0/16,GAME,no-resolve           # Tencent Cloud
-  - IP-CIDR,161.117.0.0/16,GAME,no-resolve          # Game servers
-  - IP-CIDR,43.249.0.0/16,GAME,no-resolve           # SEA servers
-  - IP-CIDR,103.11.128.0/22,GAME,no-resolve         # Indonesia game
-  - IP-CIDR,203.205.0.0/16,GAME,no-resolve          # SEA CDN
-  - IP-CIDR,182.254.0.0/16,GAME,no-resolve          # Tencent
+  - IP-CIDR,103.10.124.0/23,GAME,no-resolve # Moonton Indonesia
+  - IP-CIDR,103.10.125.0/24,GAME,no-resolve # Moonton Indonesia
+  - IP-CIDR,13.213.0.0/16,GAME,no-resolve # AWS Singapore (MLBB)
+  - IP-CIDR,45.64.0.0/16,GAME,no-resolve # Game servers SEA
+  - IP-CIDR,52.74.0.0/16,GAME,no-resolve # AWS Singapore
+  - IP-CIDR,119.81.0.0/16,GAME,no-resolve # Tencent Cloud
+  - IP-CIDR,161.117.0.0/16,GAME,no-resolve # Game servers
+  - IP-CIDR,43.249.0.0/16,GAME,no-resolve # SEA servers
+  - IP-CIDR,103.11.128.0/22,GAME,no-resolve # Indonesia game
+  - IP-CIDR,203.205.0.0/16,GAME,no-resolve # SEA CDN
+  - IP-CIDR,182.254.0.0/16,GAME,no-resolve # Tencent
 
   # === STREAMING & SOCIAL MEDIA ===
-  
+
   # YouTube
   - DOMAIN-SUFFIX,youtube.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,googlevideo.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,ytimg.com,STREAMING×SOSMED
-  
+
   # Instagram
   - DOMAIN-SUFFIX,instagram.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,cdninstagram.com,STREAMING×SOSMED
-  
+
   # TikTok
   - DOMAIN-SUFFIX,tiktok.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,tiktokcdn.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,tiktokv.com,STREAMING×SOSMED
-  
+
   # Telegram
   - DOMAIN-SUFFIX,telegram.org,STREAMING×SOSMED
   - DOMAIN-SUFFIX,telegra.ph,STREAMING×SOSMED
   - DOMAIN-SUFFIX,t.me,STREAMING×SOSMED
-  
+
   # Facebook
   - DOMAIN-SUFFIX,facebook.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,fbcdn.net,STREAMING×SOSMED
-  
+
   # Spotify
   - DOMAIN-SUFFIX,spotify.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,scdn.co,STREAMING×SOSMED
-  
+
   # Netflix
   - DOMAIN-SUFFIX,netflix.com,STREAMING×SOSMED
   - DOMAIN-SUFFIX,nflxvideo.net,STREAMING×SOSMED

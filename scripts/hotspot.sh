@@ -155,6 +155,10 @@ install_packages() {
 setup_hostapd() {
     print_info "Configuring hostapd..."
     
+    # Disable power management on WiFi interface (prevents disconnects)
+    iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+    
     cat > /etc/hostapd/hostapd.conf << EOF
 # Interface and driver
 interface=$WIFI_INTERFACE
@@ -180,6 +184,20 @@ rsn_pairwise=CCMP
 country_code=ID
 ieee80211n=1
 ieee80211d=1
+
+# Stability improvements
+beacon_int=100
+dtim_period=2
+max_num_sta=10
+rts_threshold=2347
+fragm_threshold=2346
+
+# Enhanced client compatibility
+ap_isolate=0
+ht_capab=[HT40+][SHORT-GI-20][SHORT-GI-40][DSSS_CCK-40]
+
+# Timeouts (prevent premature disconnects)
+ap_max_inactivity=300
 EOF
 
     # Point hostapd to config file
@@ -202,10 +220,14 @@ setup_dnsmasq() {
 interface=$WIFI_INTERFACE
 bind-interfaces
 
-# DHCP configuration
-dhcp-range=$DHCP_RANGE_START,$DHCP_RANGE_END,12h
+# DHCP configuration with longer lease time
+dhcp-range=$DHCP_RANGE_START,$DHCP_RANGE_END,24h
 dhcp-option=3,$IP_ADDRESS
 dhcp-option=6,$IP_ADDRESS
+
+# Prevent IP conflicts
+dhcp-authoritative
+dhcp-rapid-commit
 
 # DNS configuration
 server=8.8.8.8
@@ -220,8 +242,12 @@ local=/local/
 log-queries
 log-dhcp
 
-# Cache
+# Cache settings for stability
 cache-size=1000
+dhcp-lease-max=100
+
+# Prevent stale entries
+dhcp-leasefile=/var/lib/misc/dnsmasq.leases
 EOF
 
     print_info "dnsmasq configured"
@@ -307,6 +333,14 @@ start_hotspot() {
         ip link set $WIFI_INTERFACE up
         sleep 1
     fi
+    
+    # Disable power management to prevent disconnects
+    print_info "Disabling power management..."
+    iw dev $WIFI_INTERFACE set power_save off 2>/dev/null || true
+    iwconfig $WIFI_INTERFACE power off 2>/dev/null || true
+    
+    # Set WiFi to always on (no sleep)
+    ethtool -s $WIFI_INTERFACE wol d 2>/dev/null || true
     
     # Auto-select channel
     auto_select_channel
