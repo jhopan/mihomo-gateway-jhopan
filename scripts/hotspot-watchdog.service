@@ -1,0 +1,15 @@
+[Unit]
+Description=Hotspot Watchdog Service
+After=network.target hostapd.service dnsmasq.service
+Wants=hostapd.service dnsmasq.service
+
+[Service]
+Type=simple
+ExecStart=/opt/mihomo-gateway/scripts/hotspot-watchdog.sh start
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

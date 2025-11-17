@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
 
 **Transparent Proxy Gateway dengan Mihomo (Clash Meta)**  
-*Support Multiple Methods • Easy Setup • Production Ready*
+_Support Multiple Methods • Easy Setup • Production Ready_
 
 [📖 Docs](#-dokumentasi) • [🚀 Quick Start](#-quick-start) • [⚙️ Features](#️-fitur-utama) • [💡 Dashboard](#-dashboard)
 
@@ -28,32 +28,44 @@
 ## ✨ Fitur Utama
 
 ### 🔧 Standard Naming Convention
+
 - ✅ `proxy-providers` (organized proxy management)
 - ✅ `rule-providers` (modular routing rules)
 - 📁 Separate folders untuk providers
 
 ### 🚀 Multiple Proxy Methods
+
 - **REDIRECT** - Default method (recommended, stable!)
 - **TUN** - Available (disabled by default)
 - ~~TPROXY~~ - Removed (unstable)
 
 ### 🌐 Network Configuration
+
 - 🎯 Gateway IP: **192.168.1.1** (easy to remember!)
 - 📱 Hotspot: 192.168.1.0/24
 - 🔧 DHCP: 192.168.1.10-100
 - 🌐 DNS: Port 1053 dengan fake-ip
 
 ### 🛡️ Security & Stability
+
 - ✅ Docker/CasaOS/SSH/Tailscale bisa lewat proxy (tested safe!)
 - 🚫 IPv6 disabled (stability)
 - 📊 Smart routing dengan rule-providers
 - 🔒 Protected Mihomo API port
 
 ### 📊 Dashboard Support
+
 - 📁 Dedicated dashboard folder
 - 🔄 Easy dashboard switching
 - 💡 Multiple dashboard options (Yacd-meta, Metacubexd, etc.)
 - 📥 Download directly from GitHub
+
+### 🆕 New Features (v2.1.1)
+
+- 📡 **Hotspot Always-On** - Watchdog auto-restart hotspot
+- 👥 **Client Monitoring** - See connected devices in real-time
+- 📌 **Static IP Assignment** - Set fixed IP for your devices
+- 🚀 **Speed Test** - Integrated speedtest-cli in dashboard
 
 ## 🖥️ System Requirements
 
@@ -68,9 +80,11 @@
 ### 1️⃣ Install Mihomo
 
 ```bash
-# Download Mihomo
-wget https://github.com/MetaCubeX/mihomo/releases/latest/download/mihomo-linux-amd64 -O /usr/local/bin/mihomo
-chmod +x /usr/local/bin/mihomo
+# Download Mihomo (compatible version)
+sudo wget https://github.com/MetaCubeX/mihomo/releases/download/v1.19.16/mihomo-linux-amd64-compatible-v1.19.16.gz -O /tmp/mihomo.gz
+sudo gunzip /tmp/mihomo.gz
+sudo mv /tmp/mihomo /usr/local/bin/mihomo
+sudo chmod +x /usr/local/bin/mihomo
 
 # Verify installation
 mihomo -v
@@ -117,6 +131,7 @@ http://192.168.1.1:9090
 ```
 
 **Default credentials:**
+
 - Secret: `mihomo-gateway-2024` (ganti di config.yaml!)
 
 ## 📊 Dashboard
@@ -134,6 +149,7 @@ rm -rf Yacd-meta-gh-pages gh-pages.zip
 ```
 
 Akses dashboard:
+
 ```
 http://192.168.1.1/mihomo-ui/dashboard
 ```
@@ -181,9 +197,11 @@ mihomo-gateway/
 │
 └── README.md                   # This file
 ```
+
 cd scripts
 sudo bash setup.sh
-```
+
+````
 
 Script akan otomatis:
 
@@ -198,7 +216,7 @@ Script akan otomatis:
 
 ```bash
 sudo bash smart-setup.sh
-```
+````
 
 **SELESAI!** Smart setup akan handle semuanya!
 

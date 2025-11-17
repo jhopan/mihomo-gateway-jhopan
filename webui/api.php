@@ -566,6 +566,65 @@ switch ($action) {
         ]);
         break;
     
+    // Get connected clients
+    case 'clients':
+        $result = execCommand('bash /opt/mihomo-gateway/scripts/client-monitor.sh json /tmp/clients.json && cat /tmp/clients.json');
+        
+        if ($result['success']) {
+            echo $result['output'];
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Failed to get clients',
+                'clients' => []
+            ]);
+        }
+        break;
+    
+    // Add static IP lease
+    case 'add_static_ip':
+        $mac = $_POST['mac'] ?? '';
+        $ip = $_POST['ip'] ?? '';
+        $hostname = $_POST['hostname'] ?? '';
+        
+        if (empty($mac) || empty($ip)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'MAC and IP required'
+            ]);
+            break;
+        }
+        
+        $result = execCommand("bash /opt/mihomo-gateway/scripts/client-monitor.sh add-static $mac $ip $hostname");
+        
+        echo json_encode([
+            'success' => $result['success'],
+            'message' => $result['success'] ? 'Static IP added' : 'Failed to add static IP'
+        ]);
+        break;
+    
+    // Run speedtest
+    case 'speedtest':
+        $mode = $_GET['mode'] ?? 'run';
+        
+        if ($mode === 'cached') {
+            $result = execCommand('bash /opt/mihomo-gateway/scripts/speedtest-api.sh cached');
+        } else {
+            // Run speedtest in background
+            $result = execCommand('bash /opt/mihomo-gateway/scripts/speedtest-api.sh run');
+        }
+        
+        if ($result['success']) {
+            echo $result['output'];
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Speedtest failed',
+                'error' => $result['output']
+            ]);
+        }
+        break;
+    
     // Default - invalid action
     default:
         echo json_encode([

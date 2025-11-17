@@ -1,160 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Placeholder - Mihomo Gateway</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-            max-width: 600px;
-            text-align: center;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-        
-        .emoji {
-            font-size: 4em;
-            margin-bottom: 20px;
-        }
-        
-        p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        
-        .code-block {
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: left;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #333;
-            overflow-x: auto;
-        }
-        
-        .dashboard-list {
-            text-align: left;
-            margin: 20px 0;
-        }
-        
-        .dashboard-list li {
-            padding: 8px 0;
-            color: #555;
-        }
-        
-        .dashboard-list a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .dashboard-list a:hover {
-            text-decoration: underline;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            margin-top: 20px;
-            font-weight: 500;
-            transition: transform 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 20px 0;
-            color: #856404;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        max-width: 600px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 2em;
+      }
+
+      .emoji {
+        font-size: 4em;
+        margin-bottom: 20px;
+      }
+
+      p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
+
+      .code-block {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        text-align: left;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        color: #333;
+        overflow-x: auto;
+      }
+
+      .dashboard-list {
+        text-align: left;
+        margin: 20px 0;
+      }
+
+      .dashboard-list li {
+        padding: 8px 0;
+        color: #555;
+      }
+
+      .dashboard-list a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .dashboard-list a:hover {
+        text-decoration: underline;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-top: 20px;
+        font-weight: 500;
+        transition: transform 0.2s;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 20px 0;
+        color: #856404;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="emoji">📊</div>
-        <h1>Dashboard Belum Terinstall</h1>
-        <p>Folder dashboard masih kosong. Silahkan download dashboard favorit kamu terlebih dahulu.</p>
-        
-        <div class="warning">
-            <strong>⚠️ Perhatian!</strong><br>
-            Dashboard perlu didownload secara manual dari GitHub.
-        </div>
-        
-        <h3 style="margin-top: 30px; color: #333;">Dashboard Recommendations:</h3>
-        <div class="dashboard-list">
-            <ul>
-                <li>
-                    <strong>Yacd-meta</strong> - 
-                    <a href="https://github.com/MetaCubeX/Yacd-meta" target="_blank">Download</a>
-                    (Recommended, Simple & Fast)
-                </li>
-                <li>
-                    <strong>Metacubexd</strong> - 
-                    <a href="https://github.com/MetaCubeX/metacubexd" target="_blank">Download</a>
-                    (Modern UI, Feature Rich)
-                </li>
-                <li>
-                    <strong>Razord</strong> - 
-                    <a href="https://github.com/Metacubex/Razord" target="_blank">Download</a>
-                    (Minimal & Clean)
-                </li>
-                <li>
-                    <strong>Zashboard</strong> - 
-                    <a href="https://github.com/Zephyruso/zashboard" target="_blank">Download</a>
-                    (Alternative Choice)
-                </li>
-            </ul>
-        </div>
-        
-        <h3 style="margin-top: 30px; color: #333;">Quick Install:</h3>
-        <div class="code-block">
-cd /var/www/html/mihomo-ui/dashboard<br>
-wget https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip<br>
-unzip gh-pages.zip<br>
-mv Yacd-meta-gh-pages/* .<br>
-rm -rf Yacd-meta-gh-pages gh-pages.zip
-        </div>
-        
-        <p>Setelah install, refresh halaman ini untuk membuka dashboard.</p>
-        
-        <a href="." class="btn">🔄 Refresh Halaman</a>
+      <div class="emoji">📊</div>
+      <h1>Dashboard Belum Terinstall</h1>
+      <p>
+        Folder dashboard masih kosong. Silahkan download dashboard favorit kamu
+        terlebih dahulu.
+      </p>
+
+      <div class="warning">
+        <strong>⚠️ Perhatian!</strong><br />
+        Dashboard perlu didownload secara manual dari GitHub.
+      </div>
+
+      <h3 style="margin-top: 30px; color: #333">Dashboard Recommendations:</h3>
+      <div class="dashboard-list">
+        <ul>
+          <li>
+            <strong>Yacd-meta</strong> -
+            <a href="https://github.com/MetaCubeX/Yacd-meta" target="_blank"
+              >Download</a
+            >
+            (Recommended, Simple & Fast)
+          </li>
+          <li>
+            <strong>Metacubexd</strong> -
+            <a href="https://github.com/MetaCubeX/metacubexd" target="_blank"
+              >Download</a
+            >
+            (Modern UI, Feature Rich)
+          </li>
+          <li>
+            <strong>Razord</strong> -
+            <a href="https://github.com/Metacubex/Razord" target="_blank"
+              >Download</a
+            >
+            (Minimal & Clean)
+          </li>
+          <li>
+            <strong>Zashboard</strong> -
+            <a href="https://github.com/Zephyruso/zashboard" target="_blank"
+              >Download</a
+            >
+            (Alternative Choice)
+          </li>
+        </ul>
+      </div>
+
+      <h3 style="margin-top: 30px; color: #333">Quick Install:</h3>
+      <div class="code-block">
+        cd /var/www/html/mihomo-ui/dashboard<br />
+        wget https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip<br />
+        unzip gh-pages.zip<br />
+        mv Yacd-meta-gh-pages/* .<br />
+        rm -rf Yacd-meta-gh-pages gh-pages.zip
+      </div>
+
+      <p>Setelah install, refresh halaman ini untuk membuka dashboard.</p>
+
+      <a href="." class="btn">🔄 Refresh Halaman</a>
     </div>
-</body>
+  </body>
 </html>

@@ -7,6 +7,7 @@ Folder ini untuk menyimpan file dashboard Mihomo Web UI.
 Pilih salah satu dashboard favorit kamu:
 
 ### 1. **MetaCubeX/Yacd-meta** (Recommended)
+
 ```bash
 cd /var/www/html/mihomo-ui/dashboard
 wget https://github.com/MetaCubeX/Yacd-meta/archive/gh-pages.zip
@@ -16,6 +17,7 @@ rm -rf Yacd-meta-gh-pages gh-pages.zip
 ```
 
 ### 2. **Metacubexd** (Modern UI)
+
 ```bash
 cd /var/www/html/mihomo-ui/dashboard
 wget https://github.com/MetaCubeX/metacubexd/archive/gh-pages.zip
@@ -25,6 +27,7 @@ rm -rf metacubexd-gh-pages gh-pages.zip
 ```
 
 ### 3. **Razord** (Minimal)
+
 ```bash
 cd /var/www/html/mihomo-ui/dashboard
 wget https://github.com/Metacubex/Razord/archive/gh-pages.zip
@@ -34,6 +37,7 @@ rm -rf Razord-gh-pages gh-pages.zip
 ```
 
 ### 4. **Dashboard Zashboard** (Alternative)
+
 ```bash
 cd /var/www/html/mihomo-ui/dashboard
 wget https://github.com/Zephyruso/zashboard/archive/gh-pages.zip
@@ -61,6 +65,7 @@ cd dashboard
 ## 🌐 Akses Dashboard
 
 Setelah download, buka browser:
+
 ```
 http://192.168.1.1/mihomo-ui/dashboard
 ```
@@ -68,6 +73,7 @@ http://192.168.1.1/mihomo-ui/dashboard
 ## ⚙️ Konfigurasi
 
 Dashboard akan otomatis connect ke Mihomo API:
+
 - **API URL**: `http://192.168.1.1:9090`
 - **Secret**: `mihomo-gateway-2024` (ganti di config.yaml)
 
@@ -87,4 +93,5 @@ Dashboard akan otomatis connect ke Mihomo API:
 - [Zashboard](https://github.com/Zephyruso/zashboard)
 
 ---
+
 **Tip**: Kalau mau coba dashboard lain, download dulu ke folder terpisah terus copy ke sini.

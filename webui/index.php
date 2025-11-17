@@ -80,6 +80,14 @@
                     <span class="icon">📈</span>
                     <span>Traffic Monitor</span>
                 </a>
+                <a href="#clients" class="nav-item" data-page="clients">
+                    <span class="icon">👥</span>
+                    <span>Connected Clients</span>
+                </a>
+                <a href="#speedtest" class="nav-item" data-page="speedtest">
+                    <span class="icon">🚀</span>
+                    <span>Speed Test</span>
+                </a>
                 <a href="#dashboard-ext" class="nav-item" data-page="dashboard-ext">
                     <span class="icon">🎛️</span>
                     <span>External Dashboard</span>
