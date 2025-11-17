@@ -59,20 +59,56 @@ auto_detect_interfaces() {
             
             INTERNET_INTERFACE="$WAN_INTERFACE"
             
-            if [ -n "$WIFI_INTERFACE" ]; then
+            if [ -n "$WIFI_INTERFACE" ] && [ -n "$INTERNET_INTERFACE" ]; then
                 print_info "✓ Auto-detected WiFi: $WIFI_INTERFACE"
                 print_info "✓ Auto-detected Internet: $INTERNET_INTERFACE ($WAN_TYPE)"
                 return 0
-            else
-                print_error "No available WiFi interface found for hotspot!"
-                return 1
             fi
         fi
-    else
-        print_warn "Interface detection script not found, using defaults"
-        WIFI_INTERFACE="wlan0"
-        INTERNET_INTERFACE="eth0"
     fi
+    
+    # Fallback: manual detection if script failed
+    print_warn "Using fallback detection..."
+    
+    # Detect WiFi interface
+    for iface in wlp2s0 wlan0 wlp3s0 wlp1s0; do
+        if ip link show "$iface" &>/dev/null; then
+            WIFI_INTERFACE="$iface"
+            print_info "✓ Found WiFi: $WIFI_INTERFACE"
+            break
+        fi
+    done
+    
+    # Detect Internet interface (priority: USB > Ethernet > Others)
+    # 1. Try USB tethering (enx*, usb*)
+    for iface in $(ip link show | grep -oP '(?<=: )enx[0-9a-z]+(?=:)'); do
+        if ip addr show "$iface" 2>/dev/null | grep -q "inet "; then
+            INTERNET_INTERFACE="$iface"
+            print_info "✓ Found USB Tethering: $INTERNET_INTERFACE"
+            return 0
+        fi
+    done
+    
+    # 2. Try ethernet
+    for iface in eth0 enp0s3 eno1; do
+        if ip link show "$iface" &>/dev/null && ip addr show "$iface" | grep -q "inet "; then
+            INTERNET_INTERFACE="$iface"
+            print_info "✓ Found Ethernet: $INTERNET_INTERFACE"
+            return 0
+        fi
+    done
+    
+    # 3. Use any UP interface with IP (except WiFi, lo, docker, tailscale)
+    for iface in $(ip -o link show | awk -F': ' '{print $2}' | grep -v "^lo\|^docker\|^veth\|^tailscale\|^$WIFI_INTERFACE"); do
+        if ip addr show "$iface" 2>/dev/null | grep -q "inet " && ip link show "$iface" | grep -q "state UP"; then
+            INTERNET_INTERFACE="$iface"
+            print_info "✓ Found Active Interface: $INTERNET_INTERFACE"
+            return 0
+        fi
+    done
+    
+    print_error "Could not detect internet interface!"
+    return 1
 }
 
 # Auto-select best WiFi channel
@@ -217,22 +253,34 @@ setup_interface() {
 setup_iptables() {
     print_info "Configuring iptables for hotspot..."
     
+    # Use full path for iptables
+    local IPTABLES="/usr/sbin/iptables"
+    
+    # Verify interfaces are set
+    if [ -z "$WIFI_INTERFACE" ] || [ -z "$INTERNET_INTERFACE" ]; then
+        print_error "Interfaces not properly detected!"
+        print_error "WIFI: $WIFI_INTERFACE | INTERNET: $INTERNET_INTERFACE"
+        return 1
+    fi
+    
+    print_info "Setting up NAT: $WIFI_INTERFACE → $INTERNET_INTERFACE"
+    
     # Enable IP forwarding
     sysctl -w net.ipv4.ip_forward=1 >/dev/null 2>&1
     
     # Clear existing rules for this interface
-    iptables -D FORWARD -i "$WIFI_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT 2>/dev/null || true
-    iptables -D FORWARD -i "$INTERNET_INTERFACE" -o "$WIFI_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || true
-    iptables -t nat -D POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE 2>/dev/null || true
+    $IPTABLES -D FORWARD -i "$WIFI_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT 2>/dev/null || true
+    $IPTABLES -D FORWARD -i "$INTERNET_INTERFACE" -o "$WIFI_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT 2>/dev/null || true
+    $IPTABLES -t nat -D POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE 2>/dev/null || true
     
     # Add new rules with proper quoting
-    iptables -A FORWARD -i "$WIFI_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT
-    iptables -A FORWARD -i "$INTERNET_INTERFACE" -o "$WIFI_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
-    iptables -t nat -A POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE
+    $IPTABLES -A FORWARD -i "$WIFI_INTERFACE" -o "$INTERNET_INTERFACE" -j ACCEPT
+    $IPTABLES -A FORWARD -i "$INTERNET_INTERFACE" -o "$WIFI_INTERFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
+    $IPTABLES -t nat -A POSTROUTING -o "$INTERNET_INTERFACE" -j MASQUERADE
     
     # Verify rules added
-    if iptables -t nat -L POSTROUTING | grep -q MASQUERADE; then
-        print_info "iptables configured successfully"
+    if $IPTABLES -t nat -L POSTROUTING 2>/dev/null | grep -q MASQUERADE; then
+        print_info "✓ iptables NAT configured successfully"
     else
         print_warn "iptables rules may not be applied correctly"
     fi
@@ -251,6 +299,13 @@ start_hotspot() {
     if ! ip link show $WIFI_INTERFACE &>/dev/null; then
         print_error "WiFi interface $WIFI_INTERFACE not found!"
         exit 1
+    fi
+    
+    # Bring WiFi interface UP if DOWN
+    if ip link show $WIFI_INTERFACE | grep -q "state DOWN"; then
+        print_info "Bringing WiFi interface UP..."
+        ip link set $WIFI_INTERFACE up
+        sleep 1
     fi
     
     # Auto-select channel

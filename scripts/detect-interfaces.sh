@@ -49,7 +49,10 @@ detect_usb_tethering() {
     print_info "Detecting USB tethering interfaces..."
     
     # Common USB tethering interface patterns
-    local usb_patterns=("usb" "rndis" "enp.*s.*u")
+    # enx* = USB Ethernet adapter (modern Linux naming)
+    # usb* = Older USB naming
+    # rndis* = Android RNDIS tethering
+    local usb_patterns=("enx" "usb" "rndis" "enp.*s.*u")
     
     for pattern in "${usb_patterns[@]}"; do
         for iface in $(ip link show | grep -oP "(?<=: )${pattern}[0-9a-z]+(?=:)"); do
