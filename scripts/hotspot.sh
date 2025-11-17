@@ -292,6 +292,18 @@ EOF
 setup_dnsmasq() {
     print_info "Configuring dnsmasq..."
     
+    # Stop systemd-resolved to free port 53
+    print_info "Stopping systemd-resolved..."
+    systemctl stop systemd-resolved 2>/dev/null || true
+    systemctl disable systemd-resolved 2>/dev/null || true
+    
+    # Remove symlink and create real resolv.conf
+    if [ -L /etc/resolv.conf ]; then
+        rm /etc/resolv.conf
+        echo "nameserver 8.8.8.8" > /etc/resolv.conf
+        echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+    fi
+    
     # Backup original config
     if [ -f /etc/dnsmasq.conf ]; then
         cp /etc/dnsmasq.conf /etc/dnsmasq.conf.backup
@@ -407,6 +419,24 @@ start_hotspot() {
     if ! ip link show $WIFI_INTERFACE &>/dev/null; then
         print_error "WiFi interface $WIFI_INTERFACE not found!"
         exit 1
+    fi
+    
+    # CRITICAL: Stop NetworkManager and wpa_supplicant to prevent conflicts
+    print_info "Stopping NetworkManager and wpa_supplicant..."
+    systemctl stop NetworkManager 2>/dev/null || true
+    systemctl stop wpa_supplicant 2>/dev/null || true
+    pkill wpa_supplicant 2>/dev/null || true
+    
+    # Release WiFi interface from NetworkManager control
+    if command -v nmcli &>/dev/null; then
+        nmcli device set $WIFI_INTERFACE managed no 2>/dev/null || true
+    fi
+    
+    # Kill any process using WiFi interface
+    if pgrep -f "wpa_supplicant.*$WIFI_INTERFACE" > /dev/null; then
+        print_warn "Killing wpa_supplicant on $WIFI_INTERFACE..."
+        pkill -f "wpa_supplicant.*$WIFI_INTERFACE" || true
+        sleep 1
     fi
     
     # Bring WiFi interface UP if DOWN
