@@ -27,16 +27,19 @@ profile:
 # 🧩 TUN MODE
 # =========================
 tun:
-  enable: false
-  device: utun
-  mtu: 1500
-  stack: system
-  strict-route: false
+  enable: true
+  device: mihomo-tun
+  mtu: 9000
+  stack: mixed
+  strict-route: true
   dns-hijack:
     - any:53
     - tcp://any:53
   auto-route: true
   auto-detect-interface: true
+  inet4-address:
+    - 172.19.0.1/30
+  endpoint-independent-nat: true
 
 # =========================
 # 🌐 DNS SETTINGS
